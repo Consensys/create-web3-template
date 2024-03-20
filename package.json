@@ -1,5 +1,5 @@
 {
-  "name": "@cxalem/create-web3-template",
+  "name": "@consensys/create-web3-template",
   "type": "module",
   "module": "dist/index.js",
   "bin": {
