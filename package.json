@@ -1,5 +1,5 @@
 {
-  "name": "@consensys/create-web3-template",
+  "name": "@cxalem/create-web3-template",
   "type": "module",
   "module": "dist/index.js",
   "bin": {
@@ -16,13 +16,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "commander": "^12.0.0",
+    "commander": "12.0.0",
     "fs": "0.0.1-security",
-    "inquirer": "^9.2.15"
+    "inquirer": "9.2.15"
   },
   "devDependencies": {
-    "@types/inquirer": "^9.0.7",
-    "@types/node": "^20.11.25",
-    "typescript": "^5.4.2"
+    "@types/inquirer": "9.0.7",
+    "@types/node": "20.11.25",
+    "typescript": "5.4.2"
   }
 }
