@@ -34,6 +34,8 @@ export async function cloneTemplate(templateId: string, projectName: string) {
         projectName
       );
       fs.writeFileSync(packageJsonPath, newPackageJson);
+      //TO-DO delete .git folder
+      
       break;
     case "react-web3-starter":
       if (!template.repo_url)
@@ -47,6 +49,7 @@ export async function cloneTemplate(templateId: string, projectName: string) {
         projectName
       );
       fs.writeFileSync(reactPackageJsonPath, newReactPackageJson);
+      //TO-DO delete .git folder
       break;
     default:
       throw new Error("Unhandled template type");
