@@ -12,7 +12,15 @@
     "dev": "tsc -w",
     "link-cli": "yarn unlink --global create-web3-template && yarn link --global create-web3-template"
   },
-  "keywords": [],
+  "keywords": [
+    "wagmi",
+    "web3",
+    "viem",
+    "consensys",
+    "next",
+    "react",
+    "typescript"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
