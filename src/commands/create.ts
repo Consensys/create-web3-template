@@ -1,5 +1,6 @@
 import inquirer from "inquirer";
 import { execSync } from "child_process";
+import fs from "fs";
 
 const templates = [
   {
@@ -7,7 +8,11 @@ const templates = [
     id: "next-web3-starter",
     repo_url: "https://github.com/Consensys/next-web3-starter.git",
   },
-  { title: "Vite + Wagmi + Viem", id: "vite-wagmi-viem", repo_url: "" },
+  {
+    title: "React Web3 Starter",
+    id: "react-web3-starter",
+    repo_url: "https://github.com/Consensys/react-web3-starter.git",
+  },
 ] as const;
 
 export async function cloneTemplate(templateId: string, projectName: string) {
@@ -22,10 +27,26 @@ export async function cloneTemplate(templateId: string, projectName: string) {
         throw new Error("Repository URL not defined for RAD Starter");
       execSync(`git clone ${template.repo_url} ${projectName}`);
       console.log("Project created successfully.");
+      const packageJsonPath = `${projectName}/package.json`;
+      const packageJson = fs.readFileSync(packageJsonPath, "utf-8");
+      const newPackageJson = packageJson.replace(
+        /@consensys\/web3-starter/g,
+        projectName
+      );
+      fs.writeFileSync(packageJsonPath, newPackageJson);
       break;
-    case "vite-wagmi-viem":
-      console.log("Creating a Vite + Wagmi + Viem project");
-      // TO-DO: Implement the logic for cloning or setting up this project
+    case "react-web3-starter":
+      if (!template.repo_url)
+        throw new Error("Repository URL not defined for RAD Starter");
+      execSync(`git clone ${template.repo_url} ${projectName}`);
+      console.log("Project created successfully.");
+      const reactPackageJsonPath = `${projectName}/package.json`;
+      const reactPackageJson = fs.readFileSync(reactPackageJsonPath, "utf-8");
+      const newReactPackageJson = reactPackageJson.replace(
+        /@consensys\/react-web3-starter/g,
+        projectName
+      );
+      fs.writeFileSync(reactPackageJsonPath, newReactPackageJson);
       break;
     default:
       throw new Error("Unhandled template type");
@@ -38,7 +59,7 @@ export async function promptForProjectDetails(args: string) {
       {
         type: "input",
         name: "projectName",
-        message: "Please specify a project name: ",
+        message: "Please specify a name for your project: ",
       },
     ]);
     console.log("Creating project with name:", projectName);

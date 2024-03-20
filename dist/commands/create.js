@@ -36,17 +36,22 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 import inquirer from "inquirer";
 import { execSync } from "child_process";
+import fs from "fs";
 var templates = [
     {
         title: "Next Web3 Starter",
         id: "next-web3-starter",
         repo_url: "https://github.com/Consensys/next-web3-starter.git",
     },
-    { title: "Vite + Wagmi + Viem", id: "vite-wagmi-viem", repo_url: "" },
+    {
+        title: "React Web3 Starter",
+        id: "react-web3-starter",
+        repo_url: "https://github.com/Consensys/react-web3-starter.git",
+    },
 ];
 export function cloneTemplate(templateId, projectName) {
     return __awaiter(this, void 0, void 0, function () {
-        var template;
+        var template, packageJsonPath, packageJson, newPackageJson, reactPackageJsonPath, reactPackageJson, newReactPackageJson;
         return __generator(this, function (_a) {
             template = templates.find(function (t) { return t.id === templateId; });
             if (!template) {
@@ -58,10 +63,20 @@ export function cloneTemplate(templateId, projectName) {
                         throw new Error("Repository URL not defined for RAD Starter");
                     execSync("git clone ".concat(template.repo_url, " ").concat(projectName));
                     console.log("Project created successfully.");
+                    packageJsonPath = "".concat(projectName, "/package.json");
+                    packageJson = fs.readFileSync(packageJsonPath, "utf-8");
+                    newPackageJson = packageJson.replace(/@consensys\/web3-starter/g, projectName);
+                    fs.writeFileSync(packageJsonPath, newPackageJson);
                     break;
-                case "vite-wagmi-viem":
-                    console.log("Creating a Vite + Wagmi + Viem project");
-                    // TO-DO: Implement the logic for cloning or setting up this project
+                case "react-web3-starter":
+                    if (!template.repo_url)
+                        throw new Error("Repository URL not defined for RAD Starter");
+                    execSync("git clone ".concat(template.repo_url, " ").concat(projectName));
+                    console.log("Project created successfully.");
+                    reactPackageJsonPath = "".concat(projectName, "/package.json");
+                    reactPackageJson = fs.readFileSync(reactPackageJsonPath, "utf-8");
+                    newReactPackageJson = reactPackageJson.replace(/@consensys\/react-web3-starter/g, projectName);
+                    fs.writeFileSync(reactPackageJsonPath, newReactPackageJson);
                     break;
                 default:
                     throw new Error("Unhandled template type");
@@ -81,7 +96,7 @@ export function promptForProjectDetails(args) {
                             {
                                 type: "input",
                                 name: "projectName",
-                                message: "Please specify a project name: ",
+                                message: "Please specify a name for your project: ",
                             },
                         ])];
                 case 1:
