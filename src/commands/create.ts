@@ -26,7 +26,6 @@ export async function cloneTemplate(templateId: string, projectName: string) {
       if (!template.repo_url)
         throw new Error("Repository URL not defined for RAD Starter");
       execSync(`git clone ${template.repo_url} ${projectName}`);
-      console.log("Project created successfully.");
       const packageJsonPath = `${projectName}/package.json`;
       const packageJson = fs.readFileSync(packageJsonPath, "utf-8");
       const newPackageJson = packageJson.replace(
@@ -34,14 +33,16 @@ export async function cloneTemplate(templateId: string, projectName: string) {
         projectName
       );
       fs.writeFileSync(packageJsonPath, newPackageJson);
-      //TO-DO delete .git folder
-      
+      removeGitFolder(projectName);
+      execSync(`git init`);
+      execSync(
+        `cd ${projectName} && git add . && git commit -m "Initial commit"`
+      );
       break;
     case "react-web3-starter":
       if (!template.repo_url)
         throw new Error("Repository URL not defined for RAD Starter");
       execSync(`git clone ${template.repo_url} ${projectName}`);
-      console.log("Project created successfully.");
       const reactPackageJsonPath = `${projectName}/package.json`;
       const reactPackageJson = fs.readFileSync(reactPackageJsonPath, "utf-8");
       const newReactPackageJson = reactPackageJson.replace(
@@ -49,12 +50,26 @@ export async function cloneTemplate(templateId: string, projectName: string) {
         projectName
       );
       fs.writeFileSync(reactPackageJsonPath, newReactPackageJson);
-      //TO-DO delete .git folder
+      removeGitFolder(projectName);
+      execSync(`cd ${projectName} git init`);
+      execSync(
+        `cd ${projectName} && git add . && git commit -m "Initial commit"`
+      );
       break;
     default:
       throw new Error("Unhandled template type");
   }
 }
+
+const removeGitFolder = (projectName: string) => {
+  const gitPath = `${projectName}/.git`;
+  fs.rm(gitPath, { recursive: true }, (err) => {
+    if (err) {
+      console.error(err);
+    }
+  });
+  console.log("Project created successfully.");
+};
 
 export async function promptForProjectDetails(args: string) {
   if (!args) {
@@ -83,3 +98,14 @@ export async function promptForTemplate() {
   console.log("Creating project with template:", template);
   return templates.find((t) => t.title === template);
 }
+
+export const promptForMonorepo = async () => {
+  const { monorepo }: { monorepo: boolean } = await inquirer.prompt([
+    {
+      type: "confirm",
+      name: "monorepo",
+      message: "Would you like to use a monorepo with HardHat?",
+    },
+  ]);
+  return monorepo;
+};
