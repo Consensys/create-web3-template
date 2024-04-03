@@ -62,21 +62,25 @@ export function cloneTemplate(templateId, projectName) {
                     if (!template.repo_url)
                         throw new Error("Repository URL not defined for RAD Starter");
                     execSync("git clone ".concat(template.repo_url, " ").concat(projectName));
-                    console.log("Project created successfully.");
                     packageJsonPath = "".concat(projectName, "/package.json");
                     packageJson = fs.readFileSync(packageJsonPath, "utf-8");
                     newPackageJson = packageJson.replace(/@consensys\/web3-starter/g, projectName);
                     fs.writeFileSync(packageJsonPath, newPackageJson);
+                    removeGitFolder(projectName);
+                    execSync("git init");
+                    execSync("cd ".concat(projectName, " && git add . && git commit -m \"Initial commit\""));
                     break;
                 case "react-web3-starter":
                     if (!template.repo_url)
                         throw new Error("Repository URL not defined for RAD Starter");
                     execSync("git clone ".concat(template.repo_url, " ").concat(projectName));
-                    console.log("Project created successfully.");
                     reactPackageJsonPath = "".concat(projectName, "/package.json");
                     reactPackageJson = fs.readFileSync(reactPackageJsonPath, "utf-8");
                     newReactPackageJson = reactPackageJson.replace(/@consensys\/react-web3-starter/g, projectName);
                     fs.writeFileSync(reactPackageJsonPath, newReactPackageJson);
+                    removeGitFolder(projectName);
+                    execSync("cd ".concat(projectName, " git init"));
+                    execSync("cd ".concat(projectName, " && git add . && git commit -m \"Initial commit\""));
                     break;
                 default:
                     throw new Error("Unhandled template type");
@@ -85,6 +89,15 @@ export function cloneTemplate(templateId, projectName) {
         });
     });
 }
+var removeGitFolder = function (projectName) {
+    var gitPath = "".concat(projectName, "/.git");
+    fs.rm(gitPath, { recursive: true }, function (err) {
+        if (err) {
+            console.error(err);
+        }
+    });
+    console.log("Project created successfully.");
+};
 export function promptForProjectDetails(args) {
     return __awaiter(this, void 0, void 0, function () {
         var projectName;
@@ -129,3 +142,20 @@ export function promptForTemplate() {
         });
     });
 }
+export var promptForMonorepo = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var monorepo;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, inquirer.prompt([
+                    {
+                        type: "confirm",
+                        name: "monorepo",
+                        message: "Would you like to use a monorepo with HardHat?",
+                    },
+                ])];
+            case 1:
+                monorepo = (_a.sent()).monorepo;
+                return [2 /*return*/, monorepo];
+        }
+    });
+}); };

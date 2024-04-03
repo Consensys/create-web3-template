@@ -5,7 +5,7 @@ This is a CLI tool which scaffolds Next.js and React projects with a focus on we
 To create a new project using the Web3 Template CLI, run the following command:
 
 ```bash
-    npx create-web3-template [project-name]
+    npx @consensys/create-web3-template [project-name]
 ```
 
 This will create a new directory with the specified project name and scaffold a new project with the following features:
