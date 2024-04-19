@@ -37,7 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 import inquirer from "inquirer";
 import { execSync } from "child_process";
 import fs from "fs";
-var templates = [
+var TEMPLATES = [
     {
         title: "Next Web3 Starter",
         id: "next-web3-starter",
@@ -49,11 +49,11 @@ var templates = [
         repo_url: "https://github.com/Consensys/react-web3-starter.git",
     },
 ];
-export function cloneTemplate(templateId, projectName) {
+export function cloneTemplate(templateId, path) {
     return __awaiter(this, void 0, void 0, function () {
         var template, packageJsonPath, packageJson, newPackageJson, reactPackageJsonPath, reactPackageJson, newReactPackageJson;
         return __generator(this, function (_a) {
-            template = templates.find(function (t) { return t.id === templateId; });
+            template = TEMPLATES.find(function (t) { return t.id === templateId; });
             if (!template) {
                 throw new Error("Template not found");
             }
@@ -61,26 +61,25 @@ export function cloneTemplate(templateId, projectName) {
                 case "next-web3-starter":
                     if (!template.repo_url)
                         throw new Error("Repository URL not defined for RAD Starter");
-                    execSync("git clone ".concat(template.repo_url, " ").concat(projectName));
-                    packageJsonPath = "".concat(projectName, "/package.json");
+                    execSync("git clone ".concat(template.repo_url, " ").concat(path));
+                    packageJsonPath = "".concat(path, "/package.json");
                     packageJson = fs.readFileSync(packageJsonPath, "utf-8");
-                    newPackageJson = packageJson.replace(/@consensys\/web3-starter/g, projectName);
+                    newPackageJson = packageJson.replace(/@consensys\/web3-starter/g, path.split("/")[0]);
                     fs.writeFileSync(packageJsonPath, newPackageJson);
-                    removeGitFolder(projectName);
-                    execSync("git init");
-                    execSync("cd ".concat(projectName, " && git add . && git commit -m \"Initial commit\""));
+                    removeGitFolder(path);
+                    execSync("cd ".concat(path, " && git init && git add . && git commit -m \"Initial commit\""));
                     break;
                 case "react-web3-starter":
                     if (!template.repo_url)
                         throw new Error("Repository URL not defined for RAD Starter");
-                    execSync("git clone ".concat(template.repo_url, " ").concat(projectName));
-                    reactPackageJsonPath = "".concat(projectName, "/package.json");
+                    execSync("git clone ".concat(template.repo_url, " ").concat(path));
+                    reactPackageJsonPath = "".concat(path, "/package.json");
                     reactPackageJson = fs.readFileSync(reactPackageJsonPath, "utf-8");
-                    newReactPackageJson = reactPackageJson.replace(/@consensys\/react-web3-starter/g, projectName);
+                    newReactPackageJson = reactPackageJson.replace(/@consensys\/react-web3-starter/g, path);
                     fs.writeFileSync(reactPackageJsonPath, newReactPackageJson);
-                    removeGitFolder(projectName);
-                    execSync("cd ".concat(projectName, " git init"));
-                    execSync("cd ".concat(projectName, " && git add . && git commit -m \"Initial commit\""));
+                    removeGitFolder(path);
+                    execSync("cd ".concat(path, " git init"));
+                    execSync("cd ".concat(path, " && git add . && git commit -m \"Initial commit\""));
                     break;
                 default:
                     throw new Error("Unhandled template type");
@@ -131,13 +130,13 @@ export function promptForTemplate() {
                             type: "list",
                             name: "template",
                             message: "Please specify a template: ",
-                            choices: templates.map(function (template) { return template.title; }),
+                            choices: TEMPLATES.map(function (template) { return template.title; }),
                         },
                     ])];
                 case 1:
                     template = (_a.sent()).template;
                     console.log("Creating project with template:", template);
-                    return [2 /*return*/, templates.find(function (t) { return t.title === template; })];
+                    return [2 /*return*/, TEMPLATES.find(function (t) { return t.title === template; })];
             }
         });
     });

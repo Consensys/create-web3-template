@@ -75,12 +75,12 @@ function main() {
                             fs.rmSync("".concat(projectName, "/packages/site/package.json"));
                             nodeModulesPath = "".concat(projectName, "/node_modules");
                             fs.rmSync(nodeModulesPath, { recursive: true });
-                            execSync("git clone https://github.com/cxalem/hardhat-template.git ".concat(projectName, "/packages/blockchain"));
-                            gitPath = "".concat(projectName, "/packages/blockchain/.git");
-                            fs.rmSync(gitPath, { recursive: true });
                             return [4 /*yield*/, cloneTemplate(template.id, "".concat(projectName, "/packages/site"))];
                         case 4:
                             _a.sent();
+                            execSync("git clone https://github.com/cxalem/hardhat-template.git ".concat(projectName, "/packages/blockchain"));
+                            gitPath = "".concat(projectName, "/packages/blockchain/.git");
+                            fs.rmSync(gitPath, { recursive: true });
                             return [3 /*break*/, 7];
                         case 5: return [4 /*yield*/, cloneTemplate(template.id, projectName)];
                         case 6:

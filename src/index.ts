@@ -34,13 +34,13 @@ async function main() {
           // When we run `npm init -w ./packages/blockchain -y` we get a node_modules folder that's not needed
           const nodeModulesPath = `${projectName}/node_modules`;
           fs.rmSync(nodeModulesPath, { recursive: true });
+          await cloneTemplate(template.id, `${projectName}/packages/site`);
 
           execSync(
             `git clone https://github.com/cxalem/hardhat-template.git ${projectName}/packages/blockchain`
           );
           const gitPath = `${projectName}/packages/blockchain/.git`;
           fs.rmSync(gitPath, { recursive: true });
-          await cloneTemplate(template.id, `${projectName}/packages/site`);
         } else {
           await cloneTemplate(template.id, projectName);
         }
