@@ -2,7 +2,7 @@ import inquirer from "inquirer";
 import { execSync } from "child_process";
 import fs from "fs";
 
-const templates = [
+const TEMPLATES = [
   {
     title: "Next Web3 Starter",
     id: "next-web3-starter",
@@ -15,8 +15,8 @@ const templates = [
   },
 ] as const;
 
-export async function cloneTemplate(templateId: string, projectName: string) {
-  const template = templates.find((t) => t.id === templateId);
+export async function cloneTemplate(templateId: string, path: string) {
+  const template = TEMPLATES.find((t) => t.id === templateId);
   if (!template) {
     throw new Error("Template not found");
   }
@@ -25,36 +25,37 @@ export async function cloneTemplate(templateId: string, projectName: string) {
     case "next-web3-starter":
       if (!template.repo_url)
         throw new Error("Repository URL not defined for RAD Starter");
-      execSync(`git clone ${template.repo_url} ${projectName}`);
-      const packageJsonPath = `${projectName}/package.json`;
+
+      execSync(`git clone ${template.repo_url} ${path}`);
+
+      const packageJsonPath = `${path}/package.json`;
       const packageJson = fs.readFileSync(packageJsonPath, "utf-8");
       const newPackageJson = packageJson.replace(
         /@consensys\/web3-starter/g,
-        projectName
+        path.split("/")[0]
       );
       fs.writeFileSync(packageJsonPath, newPackageJson);
-      removeGitFolder(projectName);
-      execSync(`git init`);
+
+      removeGitFolder(path);
       execSync(
-        `cd ${projectName} && git add . && git commit -m "Initial commit"`
+        `cd ${path} && git init && git add . && git commit -m "Initial commit"`
       );
+
       break;
     case "react-web3-starter":
       if (!template.repo_url)
         throw new Error("Repository URL not defined for RAD Starter");
-      execSync(`git clone ${template.repo_url} ${projectName}`);
-      const reactPackageJsonPath = `${projectName}/package.json`;
+      execSync(`git clone ${template.repo_url} ${path}`);
+      const reactPackageJsonPath = `${path}/package.json`;
       const reactPackageJson = fs.readFileSync(reactPackageJsonPath, "utf-8");
       const newReactPackageJson = reactPackageJson.replace(
         /@consensys\/react-web3-starter/g,
-        projectName
+        path
       );
       fs.writeFileSync(reactPackageJsonPath, newReactPackageJson);
-      removeGitFolder(projectName);
-      execSync(`cd ${projectName} git init`);
-      execSync(
-        `cd ${projectName} && git add . && git commit -m "Initial commit"`
-      );
+      removeGitFolder(path);
+      execSync(`cd ${path} git init`);
+      execSync(`cd ${path} && git add . && git commit -m "Initial commit"`);
       break;
     default:
       throw new Error("Unhandled template type");
@@ -92,11 +93,11 @@ export async function promptForTemplate() {
       type: "list",
       name: "template",
       message: "Please specify a template: ",
-      choices: templates.map((template) => template.title),
+      choices: TEMPLATES.map((template) => template.title),
     },
   ]);
   console.log("Creating project with template:", template);
-  return templates.find((t) => t.title === template);
+  return TEMPLATES.find((t) => t.title === template);
 }
 
 export const promptForMonorepo = async () => {
