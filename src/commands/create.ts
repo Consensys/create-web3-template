@@ -79,6 +79,7 @@ export async function promptForProjectDetails(args: string) {
         type: "input",
         name: "projectName",
         message: "Please specify a name for your project: ",
+        default: 'my-web3-project'
       },
     ]);
     console.log("Creating project with name:", projectName);
