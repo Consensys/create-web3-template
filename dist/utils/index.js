@@ -165,6 +165,7 @@ export var createMonorepo = function (projectName, template) { return __awaiter(
                 return [4 /*yield*/, cloneTemplate(template.id, "".concat(projectName, "/packages/site"))];
             case 1:
                 _a.sent();
+                createGitIgnore(projectName);
                 execSync("git clone https://github.com/cxalem/hardhat-template.git ".concat(projectName, "/packages/blockchain"));
                 gitPath = "".concat(projectName, "/packages/blockchain/.git");
                 fs.rmSync(gitPath, { recursive: true });
@@ -172,3 +173,12 @@ export var createMonorepo = function (projectName, template) { return __awaiter(
         }
     });
 }); };
+var createGitIgnore = function (path) {
+    var gitIgnorePath = "".concat(path, "/.gitignore");
+    var gitIgnoreContent = "node_modules\n";
+    fs.writeFile(gitIgnorePath, gitIgnoreContent, function (err) {
+        if (err) {
+            console.error(err);
+        }
+    });
+};

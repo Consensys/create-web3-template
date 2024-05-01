@@ -3,12 +3,11 @@
 import { Command } from "commander";
 import {
   cloneTemplate,
+  createMonorepo,
   promptForMonorepo,
   promptForProjectDetails,
   promptForTemplate,
 } from "./utils/index.js";
-import fs from "fs";
-import { execSync } from "child_process";
 
 async function main() {
   const program = new Command()
@@ -22,25 +21,7 @@ async function main() {
         if (!template) throw new Error("Template not found");
         const isMonorepo = await promptForMonorepo();
         if (isMonorepo) {
-          fs.mkdirSync(projectName);
-          execSync(`cd ${projectName} && npm init -y`);
-          execSync(`cd ${projectName} && npm init -w ./packages/blockchain -y`);
-          execSync(`cd ${projectName} && npm init -w ./packages/site -y`);
-
-          // When we clone the repo we get a package.json file with all the dependencies, so these are not needed
-          fs.rmSync(`${projectName}/packages/blockchain/package.json`);
-          fs.rmSync(`${projectName}/packages/site/package.json`);
-
-          // When we run `npm init -w ./packages/blockchain -y` we get a node_modules folder that's not needed
-          const nodeModulesPath = `${projectName}/node_modules`;
-          fs.rmSync(nodeModulesPath, { recursive: true });
-          await cloneTemplate(template.id, `${projectName}/packages/site`);
-
-          execSync(
-            `git clone https://github.com/cxalem/hardhat-template.git ${projectName}/packages/blockchain`
-          );
-          const gitPath = `${projectName}/packages/blockchain/.git`;
-          fs.rmSync(gitPath, { recursive: true });
+          createMonorepo(projectName, template);
         } else {
           await cloneTemplate(template.id, projectName);
         }
