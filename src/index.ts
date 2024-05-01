@@ -6,7 +6,7 @@ import {
   promptForMonorepo,
   promptForProjectDetails,
   promptForTemplate,
-} from "./commands/create.js";
+} from "./utils/index.js";
 import fs from "fs";
 import { execSync } from "child_process";
 

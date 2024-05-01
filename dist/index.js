@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import { Command } from "commander";
-import { cloneTemplate, promptForMonorepo, promptForProjectDetails, promptForTemplate, } from "./commands/create.js";
+import { cloneTemplate, promptForMonorepo, promptForProjectDetails, promptForTemplate, } from "./utils/index.js";
 import fs from "fs";
 import { execSync } from "child_process";
 function main() {

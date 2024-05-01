@@ -9,9 +9,10 @@
     "strict": true,
     "outDir": "dist",
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node16"
   },
-  "include": ["src"]
+  "include": ["**/*.ts", "**/*.tsx", "types.d.ts", "src"]
 }
