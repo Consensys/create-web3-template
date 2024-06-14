@@ -79,11 +79,11 @@ export async function promptForTemplate(): Promise<Template> {
       type: "list",
       name: "template",
       message: "Please specify a template: ",
-      choices: TEMPLATES.map((template) => template.title),
+      choices: TEMPLATES.map((template) => template.name),
     },
   ]);
   const selectedTemplate = TEMPLATES.find(
-    (t) => t.title === template
+    (t) => t.name === template
   ) as unknown as Template;
   console.log("Creating project with template:", selectedTemplate.name);
   return selectedTemplate;
@@ -125,9 +125,22 @@ export const createMonorepo = async (
   fs.rmSync(nodeModulesPath, { recursive: true });
   await cloneTemplate(template.id, `${projectName}/packages/site`);
 
+  createGitIgnore(projectName);
+
   execSync(
     `git clone https://github.com/cxalem/hardhat-template.git ${projectName}/packages/blockchain`
   );
   const gitPath = `${projectName}/packages/blockchain/.git`;
   fs.rmSync(gitPath, { recursive: true });
+};
+
+const createGitIgnore = (path: string) => {
+  const gitIgnorePath = `${path}/.gitignore`;
+  const gitIgnoreContent = `node_modules\n`;
+
+  fs.writeFile(gitIgnorePath, gitIgnoreContent, (err) => {
+    if (err) {
+      console.error(err);
+    }
+  });
 };

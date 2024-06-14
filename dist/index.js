@@ -36,9 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import { Command } from "commander";
-import { cloneTemplate, promptForMonorepo, promptForProjectDetails, promptForTemplate, } from "./utils/index.js";
-import fs from "fs";
-import { execSync } from "child_process";
+import { cloneTemplate, createMonorepo, promptForMonorepo, promptForProjectDetails, promptForTemplate, } from "./utils/index.js";
 function main() {
     return __awaiter(this, void 0, void 0, function () {
         var program;
@@ -49,11 +47,11 @@ function main() {
                 .description("Web3 starter template CLI tool.")
                 .arguments("[project-name]")
                 .action(function (args) { return __awaiter(_this, void 0, void 0, function () {
-                var projectName, template, isMonorepo, nodeModulesPath, gitPath, error_1;
+                var projectName, template, isMonorepo, error_1;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            _a.trys.push([0, 8, , 9]);
+                            _a.trys.push([0, 10, , 11]);
                             return [4 /*yield*/, promptForProjectDetails(args)];
                         case 1:
                             projectName = _a.sent();
@@ -62,36 +60,28 @@ function main() {
                             template = _a.sent();
                             if (!template)
                                 throw new Error("Template not found");
+                            if (!(template.id !== "foundry-starter")) return [3 /*break*/, 7];
                             return [4 /*yield*/, promptForMonorepo()];
                         case 3:
                             isMonorepo = _a.sent();
-                            if (!isMonorepo) return [3 /*break*/, 5];
-                            fs.mkdirSync(projectName);
-                            execSync("cd ".concat(projectName, " && npm init -y"));
-                            execSync("cd ".concat(projectName, " && npm init -w ./packages/blockchain -y"));
-                            execSync("cd ".concat(projectName, " && npm init -w ./packages/site -y"));
-                            // When we clone the repo we get a package.json file with all the dependencies, so these are not needed
-                            fs.rmSync("".concat(projectName, "/packages/blockchain/package.json"));
-                            fs.rmSync("".concat(projectName, "/packages/site/package.json"));
-                            nodeModulesPath = "".concat(projectName, "/node_modules");
-                            fs.rmSync(nodeModulesPath, { recursive: true });
-                            return [4 /*yield*/, cloneTemplate(template.id, "".concat(projectName, "/packages/site"))];
-                        case 4:
+                            if (!isMonorepo) return [3 /*break*/, 4];
+                            createMonorepo(projectName, template);
+                            return [3 /*break*/, 6];
+                        case 4: return [4 /*yield*/, cloneTemplate(template.id, projectName)];
+                        case 5:
                             _a.sent();
-                            execSync("git clone https://github.com/cxalem/hardhat-template.git ".concat(projectName, "/packages/blockchain"));
-                            gitPath = "".concat(projectName, "/packages/blockchain/.git");
-                            fs.rmSync(gitPath, { recursive: true });
-                            return [3 /*break*/, 7];
-                        case 5: return [4 /*yield*/, cloneTemplate(template.id, projectName)];
-                        case 6:
-                            _a.sent();
-                            _a.label = 7;
-                        case 7: return [3 /*break*/, 9];
+                            _a.label = 6;
+                        case 6: return [3 /*break*/, 9];
+                        case 7: return [4 /*yield*/, cloneTemplate(template.id, projectName)];
                         case 8:
+                            _a.sent();
+                            _a.label = 9;
+                        case 9: return [3 /*break*/, 11];
+                        case 10:
                             error_1 = _a.sent();
                             console.error("An error occurred while creating the project:", error_1);
-                            return [3 /*break*/, 9];
-                        case 9: return [2 /*return*/];
+                            return [3 /*break*/, 11];
+                        case 11: return [2 /*return*/];
                     }
                 });
             }); })

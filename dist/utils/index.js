@@ -115,12 +115,12 @@ export function promptForTemplate() {
                             type: "list",
                             name: "template",
                             message: "Please specify a template: ",
-                            choices: TEMPLATES.map(function (template) { return template.title; }),
+                            choices: TEMPLATES.map(function (template) { return template.name; }),
                         },
                     ])];
                 case 1:
                     template = (_a.sent()).template;
-                    selectedTemplate = TEMPLATES.find(function (t) { return t.title === template; });
+                    selectedTemplate = TEMPLATES.find(function (t) { return t.name === template; });
                     console.log("Creating project with template:", selectedTemplate.name);
                     return [2 /*return*/, selectedTemplate];
             }

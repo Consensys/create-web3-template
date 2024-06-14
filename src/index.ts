@@ -19,9 +19,13 @@ async function main() {
         const projectName = await promptForProjectDetails(args);
         const template = await promptForTemplate();
         if (!template) throw new Error("Template not found");
-        const isMonorepo = await promptForMonorepo();
-        if (isMonorepo) {
-          createMonorepo(projectName, template);
+        if (template.id !== "foundry-starter") {
+          const isMonorepo = await promptForMonorepo();
+          if (isMonorepo) {
+            createMonorepo(projectName, template);
+          } else {
+            await cloneTemplate(template.id, projectName);
+          }
         } else {
           await cloneTemplate(template.id, projectName);
         }
