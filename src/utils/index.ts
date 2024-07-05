@@ -14,7 +14,7 @@ const validateTemplateExists = (input: string): void => {
   }
 };
 
-const updatePackageJson = async (
+export const updatePackageJson = async (
   projectPath: string,
   packageName: string
 ): Promise<void> => {
@@ -27,7 +27,7 @@ const updatePackageJson = async (
   await fs.writeFile(packageJsonPath, newPackageJson);
 };
 
-const removeGitFolder = async (projectPath: string): Promise<void> => {
+export const removeGitFolder = async (projectPath: string): Promise<void> => {
   const gitPath = path.join(projectPath, ".git");
   try {
     await fs.rm(gitPath, { recursive: true });
@@ -36,14 +36,16 @@ const removeGitFolder = async (projectPath: string): Promise<void> => {
   }
 };
 
-const setupGitRepository = async (projectPath: string): Promise<void> => {
+export const setupGitRepository = async (
+  projectPath: string
+): Promise<void> => {
   await execAsync(
     `cd ${projectPath} && git init && git add . && git commit -m "Initial commit"`
   );
   console.log("Git repository initialized and first commit made.");
 };
 
-const cloneAndSetupTemplate = async (
+export const cloneAndSetupTemplate = async (
   template: Template,
   projectPath: string
 ): Promise<void> => {
@@ -140,7 +142,7 @@ export const createMonorepo = async (
   });
 };
 
-const createGitIgnore = async (projectPath: string): Promise<void> => {
+export const createGitIgnore = async (projectPath: string): Promise<void> => {
   const gitIgnorePath = path.join(projectPath, ".gitignore");
   const gitIgnoreContent = `node_modules\n`;
 
