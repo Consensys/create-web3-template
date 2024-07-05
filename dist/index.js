@@ -36,59 +36,124 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import { Command } from "commander";
-import { cloneTemplate, createMonorepo, promptForMonorepo, promptForProjectDetails, promptForTemplate, } from "./utils/index.js";
+import inquirer from "inquirer";
+import { cloneTemplate, createMonorepo, promptForProjectDetails, } from "./utils/index.js";
+import { TEMPLATES } from "./templates.js";
+function promptForFramework() {
+    return __awaiter(this, void 0, void 0, function () {
+        var framework;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, inquirer.prompt([
+                        {
+                            type: "list",
+                            name: "framework",
+                            message: "Please select the framework you want to use:",
+                            choices: ["React (with Vite)", "Next.js"],
+                        },
+                    ])];
+                case 1:
+                    framework = (_a.sent()).framework;
+                    return [2 /*return*/, framework];
+            }
+        });
+    });
+}
+function promptForTooling(framework) {
+    return __awaiter(this, void 0, void 0, function () {
+        var toolingChoices, tooling;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    toolingChoices = framework === "Next.js"
+                        ? ["HardHat", "None"]
+                        : ["HardHat", "Foundry", "None"];
+                    return [4 /*yield*/, inquirer.prompt([
+                            {
+                                type: "list",
+                                name: "tooling",
+                                message: "Would you like to use HardHat or Foundry?",
+                                choices: toolingChoices,
+                            },
+                        ])];
+                case 1:
+                    tooling = (_a.sent()).tooling;
+                    return [2 /*return*/, tooling];
+            }
+        });
+    });
+}
+function handleProjectCreation(args) {
+    return __awaiter(this, void 0, void 0, function () {
+        var projectName, framework, tooling, templateId_1, template, error_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 10, , 11]);
+                    return [4 /*yield*/, promptForProjectDetails(args)];
+                case 1:
+                    projectName = _a.sent();
+                    return [4 /*yield*/, promptForFramework()];
+                case 2:
+                    framework = _a.sent();
+                    console.log("Selected framework: ".concat(framework));
+                    return [4 /*yield*/, promptForTooling(framework)];
+                case 3:
+                    tooling = _a.sent();
+                    console.log("Selected tooling: ".concat(tooling));
+                    if (framework === "React (with Vite)" && tooling === "Foundry") {
+                        templateId_1 = "foundry-starter";
+                    }
+                    else {
+                        templateId_1 =
+                            framework === "React (with Vite)"
+                                ? "react-web3-starter"
+                                : "next-web3-starter";
+                    }
+                    template = TEMPLATES.find(function (t) { return t.id === templateId_1; });
+                    if (!template) {
+                        throw new Error("Template not found");
+                    }
+                    if (!(tooling === "HardHat")) return [3 /*break*/, 5];
+                    return [4 /*yield*/, createMonorepo(projectName, template)];
+                case 4:
+                    _a.sent();
+                    return [3 /*break*/, 9];
+                case 5:
+                    if (!(tooling === "Foundry")) return [3 /*break*/, 7];
+                    return [4 /*yield*/, cloneTemplate(template.id, projectName)];
+                case 6:
+                    _a.sent();
+                    return [3 /*break*/, 9];
+                case 7: return [4 /*yield*/, cloneTemplate(template.id, projectName)];
+                case 8:
+                    _a.sent();
+                    _a.label = 9;
+                case 9: return [3 /*break*/, 11];
+                case 10:
+                    error_1 = _a.sent();
+                    console.error("An error occurred while creating the project:", error_1);
+                    return [3 /*break*/, 11];
+                case 11: return [2 /*return*/];
+            }
+        });
+    });
+}
 function main() {
     return __awaiter(this, void 0, void 0, function () {
         var program;
-        var _this = this;
         return __generator(this, function (_a) {
             program = new Command()
                 .name("create-web3-template")
                 .description("Web3 starter template CLI tool.")
                 .arguments("[project-name]")
-                .action(function (args) { return __awaiter(_this, void 0, void 0, function () {
-                var projectName, template, isMonorepo, error_1;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            _a.trys.push([0, 10, , 11]);
-                            return [4 /*yield*/, promptForProjectDetails(args)];
-                        case 1:
-                            projectName = _a.sent();
-                            return [4 /*yield*/, promptForTemplate()];
-                        case 2:
-                            template = _a.sent();
-                            if (!template)
-                                throw new Error("Template not found");
-                            if (!(template.id !== "foundry-starter")) return [3 /*break*/, 7];
-                            return [4 /*yield*/, promptForMonorepo()];
-                        case 3:
-                            isMonorepo = _a.sent();
-                            if (!isMonorepo) return [3 /*break*/, 4];
-                            createMonorepo(projectName, template);
-                            return [3 /*break*/, 6];
-                        case 4: return [4 /*yield*/, cloneTemplate(template.id, projectName)];
-                        case 5:
-                            _a.sent();
-                            _a.label = 6;
-                        case 6: return [3 /*break*/, 9];
-                        case 7: return [4 /*yield*/, cloneTemplate(template.id, projectName)];
-                        case 8:
-                            _a.sent();
-                            _a.label = 9;
-                        case 9: return [3 /*break*/, 11];
-                        case 10:
-                            error_1 = _a.sent();
-                            console.error("An error occurred while creating the project:", error_1);
-                            return [3 /*break*/, 11];
-                        case 11: return [2 /*return*/];
-                    }
-                });
-            }); })
+                .action(function (args) { return handleProjectCreation(args); })
                 .version("0.0.2");
             program.parse(process.argv);
             return [2 /*return*/];
         });
     });
 }
-main();
+main().catch(function (error) {
+    console.error("An unexpected error occurred:", error);
+});

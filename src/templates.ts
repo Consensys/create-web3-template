@@ -17,4 +17,4 @@ export const TEMPLATES = [
     repo_url: "https://github.com/cxalem/foundry-template",
     packageName: "@consensys/foundry-template",
   },
-];
+] as const;

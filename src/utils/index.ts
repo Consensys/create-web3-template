@@ -1,79 +1,90 @@
 import inquirer from "inquirer";
-import { execSync } from "child_process";
-import fs from "fs";
+import { exec } from "child_process";
+import { promises as fs } from "fs";
 import { Template } from "../../types.js";
 import { TEMPLATES } from "../templates.js";
+import path from "path";
+import util from "util";
 
-const validateTemplateExists = (input: string): boolean => {
+const execAsync = util.promisify(exec);
+
+const validateTemplateExists = (input: string): void => {
   if (!input) {
     throw new Error("Template not found");
   }
-  return true;
 };
 
-const cloneAndSetupTemplate = (template: Template, path: string): void => {
+const updatePackageJson = async (
+  projectPath: string,
+  packageName: string
+): Promise<void> => {
+  const packageJsonPath = path.join(projectPath, "package.json");
+  const packageJson = await fs.readFile(packageJsonPath, "utf-8");
+  const newPackageJson = packageJson.replace(
+    packageName,
+    path.basename(projectPath)
+  );
+  await fs.writeFile(packageJsonPath, newPackageJson);
+};
+
+const removeGitFolder = async (projectPath: string): Promise<void> => {
+  const gitPath = path.join(projectPath, ".git");
+  try {
+    await fs.rm(gitPath, { recursive: true });
+  } catch (err) {
+    console.error("Error removing .git folder:", err);
+  }
+};
+
+const setupGitRepository = async (projectPath: string): Promise<void> => {
+  await execAsync(
+    `cd ${projectPath} && git init && git add . && git commit -m "Initial commit"`
+  );
+  console.log("Git repository initialized and first commit made.");
+};
+
+const cloneAndSetupTemplate = async (
+  template: Template,
+  projectPath: string
+): Promise<void> => {
   validateTemplateExists(template.id);
 
-  execSync(`git clone ${template.repo_url} ${path}`);
-
-  const packageJsonPath = `${path}/package.json`;
-  const packageJson = fs.readFileSync(packageJsonPath, "utf-8");
-  const newPackageJson = packageJson.replace(
-    template.packageName,
-    path.split("/")[0]
-  );
-  fs.writeFileSync(packageJsonPath, newPackageJson);
-
-  removeGitFolder(path);
-  setupGitRepository(path);
+  await execAsync(`git clone ${template.repo_url} ${projectPath}`);
+  await updatePackageJson(projectPath, template.packageName);
+  await removeGitFolder(projectPath);
+  await setupGitRepository(projectPath);
 };
 
-export async function cloneTemplate(
+export const cloneTemplate = async (
   templateId: string,
-  path: string
-): Promise<void> {
-  const template = TEMPLATES.find(
-    (t) => t.id === templateId
-  ) as unknown as Template;
+  projectPath: string
+): Promise<void> => {
+  const template = TEMPLATES.find((t) => t.id === templateId) as Template;
   if (!template) {
     throw new Error("Template not found");
   }
-
-  cloneAndSetupTemplate(template, path);
-}
-
-const removeGitFolder = (projectName: string) => {
-  const gitPath = `${projectName}/.git`;
-  fs.rm(gitPath, { recursive: true }, (err) => {
-    if (err) {
-      console.error(err);
-    }
-  });
-  console.log("Project created successfully.");
+  await cloneAndSetupTemplate(template, projectPath);
 };
 
-export async function promptForProjectDetails(args: string) {
+export const promptForProjectDetails = async (
+  args: string
+): Promise<string> => {
   if (!args) {
     const { projectName } = await inquirer.prompt([
       {
         type: "input",
         name: "projectName",
         message: "Please specify a name for your project: ",
-        validate: (input) => {
-          if (!input) {
-            return "Project name cannot be empty";
-          }
-          return true;
-        },
+        validate: (input) => (input ? true : "Project name cannot be empty"),
       },
     ]);
     console.log("Creating project with name:", projectName);
     return projectName;
   }
   return args;
-}
+};
 
-export async function promptForTemplate(): Promise<Template> {
+export const promptForTemplate = async (): Promise<Template> => {
   const { template }: { template: string } = await inquirer.prompt([
     {
       type: "list",
@@ -84,10 +95,10 @@ export async function promptForTemplate(): Promise<Template> {
   ]);
   const selectedTemplate = TEMPLATES.find(
     (t) => t.name === template
-  ) as unknown as Template;
+  ) as Template;
   console.log("Creating project with template:", selectedTemplate.name);
   return selectedTemplate;
-}
+};
 
 export const promptForMonorepo = async (): Promise<boolean> => {
   const { monorepo }: { monorepo: boolean } = await inquirer.prompt([
@@ -100,47 +111,42 @@ export const promptForMonorepo = async (): Promise<boolean> => {
   return monorepo;
 };
 
-const setupGitRepository = (path: string): void => {
-  execSync(
-    `cd ${path} && git init && git add . && git commit -m "Initial commit"`
-  );
-  console.log("Git repository initialized and first commit made.");
-};
-
 export const createMonorepo = async (
   projectName: string,
   template: Template
-) => {
-  fs.mkdirSync(projectName);
-  execSync(`cd ${projectName} && npm init -y`);
-  execSync(`cd ${projectName} && npm init -w ./packages/blockchain -y`);
-  execSync(`cd ${projectName} && npm init -w ./packages/site -y`);
+): Promise<void> => {
+  await fs.mkdir(projectName);
+  await execAsync(`cd ${projectName} && npm init -y`);
+  await execAsync(`cd ${projectName} && npm init -w ./packages/blockchain -y`);
+  await execAsync(`cd ${projectName} && npm init -w ./packages/site -y`);
 
-  // When we clone the repo we get a package.json file with all the dependencies, so these are not needed
-  fs.rmSync(`${projectName}/packages/blockchain/package.json`);
-  fs.rmSync(`${projectName}/packages/site/package.json`);
+  await fs.rm(path.join(projectName, "packages", "blockchain", "package.json"));
+  await fs.rm(path.join(projectName, "packages", "site", "package.json"));
 
-  // When we run `npm init -w ./packages/blockchain -y` we get a node_modules folder that's not needed
-  const nodeModulesPath = `${projectName}/node_modules`;
-  fs.rmSync(nodeModulesPath, { recursive: true });
-  await cloneTemplate(template.id, `${projectName}/packages/site`);
+  await fs.rm(path.join(projectName, "node_modules"), { recursive: true });
+  await cloneTemplate(template.id, path.join(projectName, "packages", "site"));
 
-  createGitIgnore(projectName);
+  await createGitIgnore(projectName);
 
-  execSync(
-    `git clone https://github.com/cxalem/hardhat-template.git ${projectName}/packages/blockchain`
+  await execAsync(
+    `git clone https://github.com/cxalem/hardhat-template.git ${path.join(
+      projectName,
+      "packages",
+      "blockchain"
+    )}`
   );
-  const gitPath = `${projectName}/packages/blockchain/.git`;
-  fs.rmSync(gitPath, { recursive: true });
+  await fs.rm(path.join(projectName, "packages", "blockchain", ".git"), {
+    recursive: true,
+  });
 };
 
-const createGitIgnore = (path: string) => {
-  const gitIgnorePath = `${path}/.gitignore`;
+const createGitIgnore = async (projectPath: string): Promise<void> => {
+  const gitIgnorePath = path.join(projectPath, ".gitignore");
   const gitIgnoreContent = `node_modules\n`;
 
-  fs.writeFile(gitIgnorePath, gitIgnoreContent, (err) => {
-    if (err) {
-      console.error(err);
-    }
-  });
+  try {
+    await fs.writeFile(gitIgnorePath, gitIgnoreContent);
+  } catch (err) {
+    console.error("Error creating .gitignore file:", err);
+  }
 };
