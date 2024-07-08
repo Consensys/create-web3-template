@@ -46,7 +46,7 @@ var validateTemplateExists = function (input) {
         throw new Error("Template not found");
     }
 };
-var updatePackageJson = function (projectPath, packageName) { return __awaiter(void 0, void 0, void 0, function () {
+export var updatePackageJson = function (projectPath, packageName) { return __awaiter(void 0, void 0, void 0, function () {
     var packageJsonPath, packageJson, newPackageJson;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -63,7 +63,7 @@ var updatePackageJson = function (projectPath, packageName) { return __awaiter(v
         }
     });
 }); };
-var removeGitFolder = function (projectPath) { return __awaiter(void 0, void 0, void 0, function () {
+export var removeGitFolder = function (projectPath) { return __awaiter(void 0, void 0, void 0, function () {
     var gitPath, err_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -84,7 +84,7 @@ var removeGitFolder = function (projectPath) { return __awaiter(void 0, void 0, 
         }
     });
 }); };
-var setupGitRepository = function (projectPath) { return __awaiter(void 0, void 0, void 0, function () {
+export var setupGitRepository = function (projectPath) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, execAsync("cd ".concat(projectPath, " && git init && git add . && git commit -m \"Initial commit\""))];
@@ -95,7 +95,7 @@ var setupGitRepository = function (projectPath) { return __awaiter(void 0, void 
         }
     });
 }); };
-var cloneAndSetupTemplate = function (template, projectPath) { return __awaiter(void 0, void 0, void 0, function () {
+export var cloneAndSetupTemplate = function (template, projectPath) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -233,7 +233,7 @@ export var createMonorepo = function (projectName, template) { return __awaiter(
         }
     });
 }); };
-var createGitIgnore = function (projectPath) { return __awaiter(void 0, void 0, void 0, function () {
+export var createGitIgnore = function (projectPath) { return __awaiter(void 0, void 0, void 0, function () {
     var gitIgnorePath, gitIgnoreContent, err_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
