@@ -18,21 +18,41 @@ export const updatePackageJson = async (
   projectPath: string,
   packageName: string
 ): Promise<void> => {
-  const packageJsonPath = path.join(projectPath, "package.json");
-  const packageJson = await fs.readFile(packageJsonPath, "utf-8");
-  const newPackageJson = packageJson.replace(
-    packageName,
-    path.basename(projectPath)
-  );
-  await fs.writeFile(packageJsonPath, newPackageJson);
+  try {
+    if (!projectPath || !packageName) {
+      throw new Error(
+        "Invalid input: projectPath and packageName are required"
+      );
+    }
+
+    const packageJsonPath = path.join(projectPath, "package.json");
+    const packageJsonContent = await fs.readFile(packageJsonPath, "utf-8");
+    const packageJson = JSON.parse(packageJsonContent);
+    packageJson.name = path.basename(projectPath);
+
+    const newPackageJsonContent = JSON.stringify(packageJson, null, 2);
+    await fs.writeFile(packageJsonPath, newPackageJsonContent);
+
+    console.log(
+      `Package name updated to '${packageJson.name}' in ${packageJsonPath}`
+    );
+    return packageJson.name;
+  } catch (error) {
+    console.error(`updatePackageJson: Failed to update package.json: ${error}`);
+    throw error; // Re-throw the error to ensure the caller is aware of the failure
+  }
 };
 
-export const removeGitFolder = async (projectPath: string): Promise<void> => {
+export const removeGitFolder = async (
+  projectPath: string
+): Promise<boolean | unknown> => {
   const gitPath = path.join(projectPath, ".git");
   try {
     await fs.rm(gitPath, { recursive: true });
+    return true;
   } catch (err) {
     console.error("Error removing .git folder:", err);
+    return err;
   }
 };
 
@@ -49,23 +69,30 @@ export const cloneAndSetupTemplate = async (
   template: Template,
   projectPath: string
 ): Promise<void> => {
-  validateTemplateExists(template.id);
+  try {
+    validateTemplateExists(template.id);
 
-  await execAsync(`git clone ${template.repo_url} ${projectPath}`);
-  await updatePackageJson(projectPath, template.packageName);
-  await removeGitFolder(projectPath);
-  await setupGitRepository(projectPath);
+    await execAsync(`git clone ${template.repo_url} ${projectPath}`);
+    await updatePackageJson(projectPath, template.packageName);
+    await removeGitFolder(projectPath);
+    await setupGitRepository(projectPath);
+  } catch (error) {
+    console.error(
+      `cloneAndSetupTemplate: Error setting up the template: ${error}`
+    );
+    throw error;
+  }
 };
-
 export const cloneTemplate = async (
   templateId: string,
   projectPath: string
-): Promise<void> => {
+): Promise<Template> => {
   const template = TEMPLATES.find((t) => t.id === templateId) as Template;
   if (!template) {
     throw new Error("Template not found");
   }
   await cloneAndSetupTemplate(template, projectPath);
+  return template;
 };
 
 export const promptForProjectDetails = async (

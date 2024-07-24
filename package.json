@@ -27,7 +27,8 @@
   "dependencies": {
     "commander": "12.0.0",
     "fs": "0.0.1-security",
-    "inquirer": "9.2.15"
+    "inquirer": "9.2.15",
+    "memfs": "^4.9.3"
   },
   "devDependencies": {
     "@types/inquirer": "9.0.7",
