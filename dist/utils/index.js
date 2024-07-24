@@ -47,19 +47,31 @@ var validateTemplateExists = function (input) {
     }
 };
 export var updatePackageJson = function (projectPath, packageName) { return __awaiter(void 0, void 0, void 0, function () {
-    var packageJsonPath, packageJson, newPackageJson;
+    var packageJsonPath, packageJsonContent, packageJson, newPackageJsonContent, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
+                _a.trys.push([0, 3, , 4]);
+                if (!projectPath || !packageName) {
+                    throw new Error("Invalid input: projectPath and packageName are required");
+                }
                 packageJsonPath = path.join(projectPath, "package.json");
                 return [4 /*yield*/, fs.readFile(packageJsonPath, "utf-8")];
             case 1:
-                packageJson = _a.sent();
-                newPackageJson = packageJson.replace(packageName, path.basename(projectPath));
-                return [4 /*yield*/, fs.writeFile(packageJsonPath, newPackageJson)];
+                packageJsonContent = _a.sent();
+                packageJson = JSON.parse(packageJsonContent);
+                packageJson.name = path.basename(projectPath);
+                newPackageJsonContent = JSON.stringify(packageJson, null, 2);
+                return [4 /*yield*/, fs.writeFile(packageJsonPath, newPackageJsonContent)];
             case 2:
                 _a.sent();
-                return [2 /*return*/];
+                console.log("Package name updated to '".concat(packageJson.name, "' in ").concat(packageJsonPath));
+                return [2 /*return*/, packageJson.name];
+            case 3:
+                error_1 = _a.sent();
+                console.error("updatePackageJson: Failed to update package.json: ".concat(error_1));
+                throw error_1; // Re-throw the error to ensure the caller is aware of the failure
+            case 4: return [2 /*return*/];
         }
     });
 }); };
@@ -75,11 +87,11 @@ export var removeGitFolder = function (projectPath) { return __awaiter(void 0, v
                 return [4 /*yield*/, fs.rm(gitPath, { recursive: true })];
             case 2:
                 _a.sent();
-                return [3 /*break*/, 4];
+                return [2 /*return*/, true];
             case 3:
                 err_1 = _a.sent();
                 console.error("Error removing .git folder:", err_1);
-                return [3 /*break*/, 4];
+                return [2 /*return*/, err_1];
             case 4: return [2 /*return*/];
         }
     });
@@ -96,9 +108,11 @@ export var setupGitRepository = function (projectPath) { return __awaiter(void 0
     });
 }); };
 export var cloneAndSetupTemplate = function (template, projectPath) { return __awaiter(void 0, void 0, void 0, function () {
+    var error_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
+                _a.trys.push([0, 5, , 6]);
                 validateTemplateExists(template.id);
                 return [4 /*yield*/, execAsync("git clone ".concat(template.repo_url, " ").concat(projectPath))];
             case 1:
@@ -112,7 +126,12 @@ export var cloneAndSetupTemplate = function (template, projectPath) { return __a
                 return [4 /*yield*/, setupGitRepository(projectPath)];
             case 4:
                 _a.sent();
-                return [2 /*return*/];
+                return [3 /*break*/, 6];
+            case 5:
+                error_2 = _a.sent();
+                console.error("cloneAndSetupTemplate: Error setting up the template: ".concat(error_2));
+                throw error_2;
+            case 6: return [2 /*return*/];
         }
     });
 }); };
@@ -128,7 +147,7 @@ export var cloneTemplate = function (templateId, projectPath) { return __awaiter
                 return [4 /*yield*/, cloneAndSetupTemplate(template, projectPath)];
             case 1:
                 _a.sent();
-                return [2 /*return*/];
+                return [2 /*return*/, template];
         }
     });
 }); };
