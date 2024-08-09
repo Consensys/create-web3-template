@@ -1,7 +1,6 @@
 import inquirer from "inquirer";
 import { exec } from "child_process";
 import { promises as fs } from "fs";
-import { Template } from "../../types.js";
 import { TEMPLATES } from "../templates.js";
 import path from "path";
 import util from "util";
@@ -83,6 +82,7 @@ export const cloneAndSetupTemplate = async (
     throw error;
   }
 };
+
 export const cloneTemplate = async (
   templateId: string,
   projectPath: string

@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,48 +34,25 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import { Command } from "commander";
-import inquirer from "inquirer";
+import { exec } from "child_process";
+import util from "util";
+import { BLOCKCHAIN_TOOLING_CHOICES, FRAMEWORK_CHOICES, PACAKGE_MANAGER_CHOICES, } from "../constants/index.js";
 import fs from "fs";
-import { promptForProjectDetails } from "./utils/index.js";
-var FRAMEWORK_CHOICES = [
-    {
-        name: "React (with Vite)",
-        value: "react",
-    },
-    {
-        name: "Next.js",
-        value: "nextjs",
-    },
-];
-var BLOCKCHAIN_TOOLING_CHOICES = [
-    {
-        name: "HardHat",
-        value: "hardhat",
-    },
-    {
-        name: "Foundry",
-        value: "foundry",
-    },
-    {
-        name: "None",
-        value: "none",
-    },
-];
-var PACAKGE_MANAGER_CHOICES = [
-    {
-        name: "Yarn",
-        value: "yarn",
-    },
-    {
-        name: "NPM",
-        value: "npm",
-    },
-    {
-        name: "pnpm",
-        value: "pnpm",
-    },
-];
+import inquirer from "inquirer";
+import { promptForProjectDetails } from "./index.js";
+var execAsync = util.promisify(exec);
+var usePackageManager = function (packageManager) {
+    switch (packageManager) {
+        case "npm":
+            return "--use-npm";
+        case "yarn":
+            return "--use-yarn";
+        case "pnpm":
+            return "--use-pnpm";
+        default:
+            return "--use-npm";
+    }
+};
 function promptForFramework() {
     return __awaiter(this, void 0, void 0, function () {
         var frameworkChoice, framework;
@@ -146,43 +122,83 @@ function promptForPackageManager() {
         });
     });
 }
-// async function handleProjectCreation(args: string): Promise<void> {
-//   try {
-//     // Prompt user for project details if not provided
-//     const projectName = await promptForProjectDetails(args);
-//     // Prompt user for framework selection
-//     const framework = await promptForFramework();
-//     console.log(`Selected framework: ${framework}`);
-//     // Prompt user for tooling selection
-//     const tooling = await promptForTooling(framework);
-//     console.log(`Selected tooling: ${tooling}`);
-//     // Determine the template ID based on the framework and tooling
-//     let templateId: string;
-//     if (framework === "React (with Vite)" && tooling === "Foundry") {
-//       templateId = "foundry-starter";
-//     } else {
-//       templateId =
-//         framework === "React (with Vite)"
-//           ? "react-web3-starter"
-//           : "next-web3-starter";
-//     }
-//     const template = TEMPLATES.find((t) => t.id === templateId);
-//     if (!template) {
-//       throw new Error("Template not found");
-//     }
-//     // Proceed based on the selected tooling
-//     if (tooling === "HardHat") {
-//       await createMonorepo(projectName, template);
-//     } else if (tooling === "Foundry") {
-//       await cloneTemplate(template.id, projectName);
-//     } else {
-//       await cloneTemplate(template.id, projectName);
-//     }
-//   } catch (error) {
-//     console.error("An error occurred while creating the project:", error);
-//   }
-// }
-var promptForOptions = function (args) { return __awaiter(void 0, void 0, void 0, function () {
+var createDirectory = function (projectName) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        try {
+            fs.mkdirSync(projectName);
+        }
+        catch (error) {
+            console.error("An unexpected error occurred:", error);
+        }
+        return [2 /*return*/];
+    });
+}); };
+export var createNextApp = function (options) { return __awaiter(void 0, void 0, void 0, function () {
+    var projectName, packageManager, command, error_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                projectName = options.projectName, packageManager = options.packageManager;
+                command = "npx create-next-app ".concat(projectName, " --ts --tailwind --eslint --app --src-dir --import-alias \"@/*\" ").concat(usePackageManager(packageManager));
+                return [4 /*yield*/, execAsync(command)];
+            case 1:
+                _a.sent();
+                console.log("Next.js project created successfully!");
+                return [3 /*break*/, 3];
+            case 2:
+                error_1 = _a.sent();
+                console.error("An unexpected error occurred:", error_1);
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); };
+export var createReactApp = function (options) { return __awaiter(void 0, void 0, void 0, function () {
+    var projectName, packageManager, _a, error_2;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _b.trys.push([0, 9, , 10]);
+                projectName = options.projectName, packageManager = options.packageManager;
+                _a = packageManager;
+                switch (_a) {
+                    case "npm": return [3 /*break*/, 1];
+                    case "yarn": return [3 /*break*/, 3];
+                    case "pnpm": return [3 /*break*/, 5];
+                }
+                return [3 /*break*/, 7];
+            case 1:
+                console.log("Creating project with npm");
+                return [4 /*yield*/, execAsync("npm init vite@latest ".concat(projectName, " -- --template react-ts"))];
+            case 2:
+                _b.sent();
+                return [3 /*break*/, 8];
+            case 3:
+                console.log("Creating project with yarn");
+                return [4 /*yield*/, execAsync("yarn create vite ".concat(projectName, " --template react-ts"))];
+            case 4:
+                _b.sent();
+                return [3 /*break*/, 8];
+            case 5:
+                console.log("Creating project with pnpm");
+                return [4 /*yield*/, execAsync("pnpm create vite ".concat(projectName, " --template react-ts"))];
+            case 6:
+                _b.sent();
+                return [3 /*break*/, 8];
+            case 7: return [3 /*break*/, 8];
+            case 8:
+                console.log("React project created successfully!");
+                return [3 /*break*/, 10];
+            case 9:
+                error_2 = _b.sent();
+                console.error("An unexpected error occurred:", error_2);
+                return [3 /*break*/, 10];
+            case 10: return [2 /*return*/];
+        }
+    });
+}); };
+export var promptForOptions = function (args) { return __awaiter(void 0, void 0, void 0, function () {
     var projectName, framework, tooling, packageManager, options;
     var _a, _b, _c;
     return __generator(this, function (_d) {
@@ -205,28 +221,7 @@ var promptForOptions = function (args) { return __awaiter(void 0, void 0, void 0
                     blockchain_tooling: (_b = BLOCKCHAIN_TOOLING_CHOICES.find(function (choice) { return choice.name === tooling; })) === null || _b === void 0 ? void 0 : _b.value,
                     packageManager: (_c = PACAKGE_MANAGER_CHOICES.find(function (choice) { return choice.name === packageManager; })) === null || _c === void 0 ? void 0 : _c.value,
                 };
-                fs.mkdirSync("".concat(process.cwd(), "/").concat(projectName));
-                fs.writeFileSync("".concat(process.cwd(), "/").concat(projectName, "/web3-template.config.json"), JSON.stringify(options, null, 2));
-                console.log("Options:", options);
-                return [2 /*return*/];
+                return [2 /*return*/, options];
         }
     });
 }); };
-function main() {
-    return __awaiter(this, void 0, void 0, function () {
-        var program;
-        return __generator(this, function (_a) {
-            program = new Command()
-                .name("create-web3-template")
-                .description("Web3 starter template CLI tool.")
-                .arguments("[project-name]")
-                .action(function (args) { return promptForOptions(args); })
-                .version("0.0.2");
-            program.parse(process.argv);
-            return [2 /*return*/];
-        });
-    });
-}
-main().catch(function (error) {
-    console.error("An unexpected error occurred:", error);
-});
