@@ -151,28 +151,6 @@ export var cloneTemplate = function (templateId, projectPath) { return __awaiter
         }
     });
 }); };
-export var promptForProjectDetails = function (args) { return __awaiter(void 0, void 0, void 0, function () {
-    var projectName;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                if (!!args) return [3 /*break*/, 2];
-                return [4 /*yield*/, inquirer.prompt([
-                        {
-                            type: "input",
-                            name: "projectName",
-                            message: "Please specify a name for your project: ",
-                            validate: function (input) { return (input ? true : "Project name cannot be empty"); },
-                        },
-                    ])];
-            case 1:
-                projectName = (_a.sent()).projectName;
-                console.log("Creating project with name:", projectName);
-                return [2 /*return*/, projectName];
-            case 2: return [2 /*return*/, args];
-        }
-    });
-}); };
 export var promptForTemplate = function () { return __awaiter(void 0, void 0, void 0, function () {
     var template, selectedTemplate;
     return __generator(this, function (_a) {
