@@ -36,105 +36,30 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import { Command } from "commander";
-import inquirer from "inquirer";
-import fs from "fs";
-import { promptForProjectDetails } from "./utils/index.js";
-import { BLOCKCHAIN_TOOLING_CHOICES, FRAMEWORK_CHOICES, PACAKGE_MANAGER_CHOICES, } from "./constants/index.js";
-function promptForFramework() {
-    return __awaiter(this, void 0, void 0, function () {
-        var frameworkChoice, framework;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    frameworkChoice = FRAMEWORK_CHOICES.map(function (choice) { return choice.name; });
-                    return [4 /*yield*/, inquirer.prompt([
-                            {
-                                type: "list",
-                                name: "framework",
-                                message: "Please select the framework you want to use:",
-                                choices: frameworkChoice,
-                            },
-                        ])];
-                case 1:
-                    framework = (_a.sent()).framework;
-                    console.log("Selected framework: ".concat(framework));
-                    return [2 /*return*/, framework];
-            }
-        });
-    });
-}
-function promptForTooling() {
-    return __awaiter(this, void 0, void 0, function () {
-        var toolingChoice, tooling;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    toolingChoice = BLOCKCHAIN_TOOLING_CHOICES.map(function (choice) { return choice.name; });
-                    return [4 /*yield*/, inquirer.prompt([
-                            {
-                                type: "list",
-                                name: "tooling",
-                                message: "Would you like to use HardHat or Foundry?",
-                                choices: toolingChoice,
-                            },
-                        ])];
-                case 1:
-                    tooling = (_a.sent()).tooling;
-                    console.log("Selected tooling: ".concat(tooling));
-                    return [2 /*return*/, tooling];
-            }
-        });
-    });
-}
-function promptForPackageManager() {
-    return __awaiter(this, void 0, void 0, function () {
-        var packageManagerChoice, packageManager;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    packageManagerChoice = PACAKGE_MANAGER_CHOICES.map(function (choice) { return choice.name; });
-                    return [4 /*yield*/, inquirer.prompt([
-                            {
-                                type: "list",
-                                name: "packageManager",
-                                message: "Please select the package manager you want to use:",
-                                choices: packageManagerChoice,
-                            },
-                        ])];
-                case 1:
-                    packageManager = (_a.sent()).packageManager;
-                    console.log("Selected package manager: ".concat(packageManager));
-                    return [2 /*return*/, packageManager];
-            }
-        });
-    });
-}
-var promptForOptions = function (args) { return __awaiter(void 0, void 0, void 0, function () {
-    var projectName, framework, tooling, packageManager, options;
-    var _a, _b, _c;
-    return __generator(this, function (_d) {
-        switch (_d.label) {
-            case 0: return [4 /*yield*/, promptForProjectDetails(args)];
+import { createNextApp, createReactApp, promptForOptions, } from "./utils/helpers.js";
+var createProject = function (args) { return __awaiter(void 0, void 0, void 0, function () {
+    var options, _a;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0: return [4 /*yield*/, promptForOptions(args)];
             case 1:
-                projectName = _d.sent();
-                return [4 /*yield*/, promptForFramework()];
-            case 2:
-                framework = _d.sent();
-                return [4 /*yield*/, promptForTooling()];
+                options = _b.sent();
+                _a = options.framework;
+                switch (_a) {
+                    case "nextjs": return [3 /*break*/, 2];
+                    case "react": return [3 /*break*/, 4];
+                }
+                return [3 /*break*/, 6];
+            case 2: return [4 /*yield*/, createNextApp(options)];
             case 3:
-                tooling = _d.sent();
-                return [4 /*yield*/, promptForPackageManager()];
-            case 4:
-                packageManager = _d.sent();
-                options = {
-                    projectName: projectName,
-                    framework: (_a = FRAMEWORK_CHOICES.find(function (choice) { return choice.name === framework; })) === null || _a === void 0 ? void 0 : _a.value,
-                    blockchain_tooling: (_b = BLOCKCHAIN_TOOLING_CHOICES.find(function (choice) { return choice.name === tooling; })) === null || _b === void 0 ? void 0 : _b.value,
-                    packageManager: (_c = PACAKGE_MANAGER_CHOICES.find(function (choice) { return choice.name === packageManager; })) === null || _c === void 0 ? void 0 : _c.value,
-                };
-                fs.mkdirSync("".concat(process.cwd(), "/").concat(projectName));
-                fs.writeFileSync("".concat(process.cwd(), "/").concat(projectName, "/web3-template.config.json"), JSON.stringify(options, null, 2));
-                return [2 /*return*/];
+                _b.sent();
+                return [3 /*break*/, 7];
+            case 4: return [4 /*yield*/, createReactApp(options)];
+            case 5:
+                _b.sent();
+                return [3 /*break*/, 7];
+            case 6: return [3 /*break*/, 7];
+            case 7: return [2 /*return*/];
         }
     });
 }); };
@@ -146,7 +71,7 @@ function main() {
                 .name("create-web3-template")
                 .description("Web3 starter template CLI tool.")
                 .arguments("[project-name]")
-                .action(function (args) { return promptForOptions(args); })
+                .action(function (args) { return createProject(args); })
                 .version("0.0.2");
             program.parse(process.argv);
             return [2 /*return*/];
