@@ -39,7 +39,6 @@ import util from "util";
 import { BLOCKCHAIN_TOOLING_CHOICES, FRAMEWORK_CHOICES, PACAKGE_MANAGER_CHOICES, } from "../constants/index.js";
 import fs from "fs";
 import inquirer from "inquirer";
-import { promptForProjectDetails } from "./index.js";
 var execAsync = util.promisify(exec);
 var usePackageManager = function (packageManager) {
     switch (packageManager) {
@@ -53,6 +52,28 @@ var usePackageManager = function (packageManager) {
             return "--use-npm";
     }
 };
+var promptForProjectDetails = function (args) { return __awaiter(void 0, void 0, void 0, function () {
+    var projectName;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                if (!!args) return [3 /*break*/, 2];
+                return [4 /*yield*/, inquirer.prompt([
+                        {
+                            type: "input",
+                            name: "projectName",
+                            message: "Please specify a name for your project: ",
+                            validate: function (input) { return (input ? true : "Project name cannot be empty"); },
+                        },
+                    ])];
+            case 1:
+                projectName = (_a.sent()).projectName;
+                console.log("Creating project with name:", projectName);
+                return [2 /*return*/, projectName];
+            case 2: return [2 /*return*/, args];
+        }
+    });
+}); };
 function promptForFramework() {
     return __awaiter(this, void 0, void 0, function () {
         var frameworkChoice, framework;

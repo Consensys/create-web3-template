@@ -7,7 +7,6 @@ import {
 } from "../constants/index.js";
 import fs from "fs";
 import inquirer from "inquirer";
-import { promptForProjectDetails } from "./index.js";
 
 const execAsync = util.promisify(exec);
 
@@ -22,6 +21,22 @@ const usePackageManager = (packageManager: string) => {
     default:
       return "--use-npm";
   }
+};
+
+const promptForProjectDetails = async (args: string): Promise<string> => {
+  if (!args) {
+    const { projectName } = await inquirer.prompt([
+      {
+        type: "input",
+        name: "projectName",
+        message: "Please specify a name for your project: ",
+        validate: (input) => (input ? true : "Project name cannot be empty"),
+      },
+    ]);
+    console.log("Creating project with name:", projectName);
+    return projectName;
+  }
+  return args;
 };
 
 async function promptForFramework(): Promise<string> {

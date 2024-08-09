@@ -95,24 +95,6 @@ export const cloneTemplate = async (
   return template;
 };
 
-export const promptForProjectDetails = async (
-  args: string
-): Promise<string> => {
-  if (!args) {
-    const { projectName } = await inquirer.prompt([
-      {
-        type: "input",
-        name: "projectName",
-        message: "Please specify a name for your project: ",
-        validate: (input) => (input ? true : "Project name cannot be empty"),
-      },
-    ]);
-    console.log("Creating project with name:", projectName);
-    return projectName;
-  }
-  return args;
-};
-
 export const promptForTemplate = async (): Promise<Template> => {
   const { template }: { template: string } = await inquirer.prompt([
     {
