@@ -1,25 +1,7 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
-import {
-  createNextApp,
-  createReactApp,
-  promptForOptions,
-} from "./utils/helpers.js";
-
-const createProject = async (args: string) => {
-  const options = await promptForOptions(args);
-  switch (options.framework) {
-    case "nextjs":
-      await createNextApp(options);
-      break;
-    case "react":
-      await createReactApp(options);
-      break;
-    default:
-      break;
-  }
-};
+import { createProject } from "./utils/helpers.js";
 
 async function main() {
   const program = new Command()

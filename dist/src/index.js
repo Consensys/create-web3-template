@@ -36,33 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import { Command } from "commander";
-import { createNextApp, createReactApp, promptForOptions, } from "./utils/helpers.js";
-var createProject = function (args) { return __awaiter(void 0, void 0, void 0, function () {
-    var options, _a;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
-            case 0: return [4 /*yield*/, promptForOptions(args)];
-            case 1:
-                options = _b.sent();
-                _a = options.framework;
-                switch (_a) {
-                    case "nextjs": return [3 /*break*/, 2];
-                    case "react": return [3 /*break*/, 4];
-                }
-                return [3 /*break*/, 6];
-            case 2: return [4 /*yield*/, createNextApp(options)];
-            case 3:
-                _b.sent();
-                return [3 /*break*/, 7];
-            case 4: return [4 /*yield*/, createReactApp(options)];
-            case 5:
-                _b.sent();
-                return [3 /*break*/, 7];
-            case 6: return [3 /*break*/, 7];
-            case 7: return [2 /*return*/];
-        }
-    });
-}); };
+import { createProject } from "./utils/helpers.js";
 function main() {
     return __awaiter(this, void 0, void 0, function () {
         var program;

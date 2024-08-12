@@ -37,7 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 import inquirer from "inquirer";
 import { exec } from "child_process";
 import { promises as fs } from "fs";
-import { TEMPLATES } from "../templates.js";
+import { TEMPLATES } from "../constants/templates.js";
 import path from "path";
 import util from "util";
 var execAsync = util.promisify(exec);
