@@ -37,9 +37,73 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 import { exec } from "child_process";
 import util from "util";
 import { BLOCKCHAIN_TOOLING_CHOICES, FRAMEWORK_CHOICES, PACAKGE_MANAGER_CHOICES, } from "../constants/index.js";
-import fs from "fs";
+import { promises as fs } from "fs";
 import inquirer from "inquirer";
+import path from "path";
 var execAsync = util.promisify(exec);
+var promptForFramework = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var frameworkChoice, framework;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                frameworkChoice = FRAMEWORK_CHOICES.map(function (choice) { return choice.name; });
+                return [4 /*yield*/, inquirer.prompt([
+                        {
+                            type: "list",
+                            name: "framework",
+                            message: "Please select the framework you want to use:",
+                            choices: frameworkChoice,
+                        },
+                    ])];
+            case 1:
+                framework = (_a.sent()).framework;
+                console.log("Selected framework: ".concat(framework));
+                return [2 /*return*/, framework];
+        }
+    });
+}); };
+var promptForTooling = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var toolingChoice, tooling;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                toolingChoice = BLOCKCHAIN_TOOLING_CHOICES.map(function (choice) { return choice.name; });
+                return [4 /*yield*/, inquirer.prompt([
+                        {
+                            type: "list",
+                            name: "tooling",
+                            message: "Would you like to use HardHat or Foundry?",
+                            choices: toolingChoice,
+                        },
+                    ])];
+            case 1:
+                tooling = (_a.sent()).tooling;
+                console.log("Selected tooling: ".concat(tooling));
+                return [2 /*return*/, tooling];
+        }
+    });
+}); };
+var promptForPackageManager = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var packageManagerChoice, packageManager;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                packageManagerChoice = PACAKGE_MANAGER_CHOICES.map(function (choice) { return choice.name; });
+                return [4 /*yield*/, inquirer.prompt([
+                        {
+                            type: "list",
+                            name: "packageManager",
+                            message: "Please select the package manager you want to use:",
+                            choices: packageManagerChoice,
+                        },
+                    ])];
+            case 1:
+                packageManager = (_a.sent()).packageManager;
+                console.log("Selected package manager: ".concat(packageManager));
+                return [2 /*return*/, packageManager];
+        }
+    });
+}); };
 var usePackageManager = function (packageManager) {
     switch (packageManager) {
         case "npm":
@@ -74,98 +138,15 @@ var promptForProjectDetails = function (args) { return __awaiter(void 0, void 0,
         }
     });
 }); };
-function promptForFramework() {
-    return __awaiter(this, void 0, void 0, function () {
-        var frameworkChoice, framework;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    frameworkChoice = FRAMEWORK_CHOICES.map(function (choice) { return choice.name; });
-                    return [4 /*yield*/, inquirer.prompt([
-                            {
-                                type: "list",
-                                name: "framework",
-                                message: "Please select the framework you want to use:",
-                                choices: frameworkChoice,
-                            },
-                        ])];
-                case 1:
-                    framework = (_a.sent()).framework;
-                    console.log("Selected framework: ".concat(framework));
-                    return [2 /*return*/, framework];
-            }
-        });
-    });
-}
-function promptForTooling() {
-    return __awaiter(this, void 0, void 0, function () {
-        var toolingChoice, tooling;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    toolingChoice = BLOCKCHAIN_TOOLING_CHOICES.map(function (choice) { return choice.name; });
-                    return [4 /*yield*/, inquirer.prompt([
-                            {
-                                type: "list",
-                                name: "tooling",
-                                message: "Would you like to use HardHat or Foundry?",
-                                choices: toolingChoice,
-                            },
-                        ])];
-                case 1:
-                    tooling = (_a.sent()).tooling;
-                    console.log("Selected tooling: ".concat(tooling));
-                    return [2 /*return*/, tooling];
-            }
-        });
-    });
-}
-function promptForPackageManager() {
-    return __awaiter(this, void 0, void 0, function () {
-        var packageManagerChoice, packageManager;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    packageManagerChoice = PACAKGE_MANAGER_CHOICES.map(function (choice) { return choice.name; });
-                    return [4 /*yield*/, inquirer.prompt([
-                            {
-                                type: "list",
-                                name: "packageManager",
-                                message: "Please select the package manager you want to use:",
-                                choices: packageManagerChoice,
-                            },
-                        ])];
-                case 1:
-                    packageManager = (_a.sent()).packageManager;
-                    console.log("Selected package manager: ".concat(packageManager));
-                    return [2 /*return*/, packageManager];
-            }
-        });
-    });
-}
 var createDirectory = function (projectName) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        try {
-            fs.mkdirSync(projectName);
-        }
-        catch (error) {
-            console.error("An unexpected error occurred:", error);
-        }
-        return [2 /*return*/];
-    });
-}); };
-export var createNextApp = function (options) { return __awaiter(void 0, void 0, void 0, function () {
-    var projectName, packageManager, command, error_1;
+    var error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                projectName = options.projectName, packageManager = options.packageManager;
-                command = "npx create-next-app ".concat(projectName, " --ts --tailwind --eslint --app --src-dir --import-alias \"@/*\" ").concat(usePackageManager(packageManager));
-                return [4 /*yield*/, execAsync(command)];
+                return [4 /*yield*/, fs.mkdir(projectName)];
             case 1:
                 _a.sent();
-                console.log("Next.js project created successfully!");
                 return [3 /*break*/, 3];
             case 2:
                 error_1 = _a.sent();
@@ -175,51 +156,95 @@ export var createNextApp = function (options) { return __awaiter(void 0, void 0,
         }
     });
 }); };
-export var createReactApp = function (options) { return __awaiter(void 0, void 0, void 0, function () {
-    var projectName, packageManager, _a, error_2;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+var pathOrProjectName = function (projectName, path) {
+    return path ? path : projectName;
+};
+var createNextApp = function (options, path) { return __awaiter(void 0, void 0, void 0, function () {
+    var projectName, packageManager, command, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
             case 0:
-                _b.trys.push([0, 9, , 10]);
-                projectName = options.projectName, packageManager = options.packageManager;
-                _a = packageManager;
-                switch (_a) {
-                    case "npm": return [3 /*break*/, 1];
-                    case "yarn": return [3 /*break*/, 3];
-                    case "pnpm": return [3 /*break*/, 5];
-                }
-                return [3 /*break*/, 7];
+                console.log("Creating Next.js project...");
+                _a.label = 1;
             case 1:
-                console.log("Creating project with npm");
-                return [4 /*yield*/, execAsync("npm init vite@latest ".concat(projectName, " -- --template react-ts"))];
+                _a.trys.push([1, 3, , 4]);
+                projectName = options.projectName, packageManager = options.packageManager;
+                command = "npx create-next-app ".concat(pathOrProjectName(projectName, path), " --ts --tailwind --eslint --app --src-dir --import-alias \"@/*\" ").concat(usePackageManager(packageManager));
+                return [4 /*yield*/, execAsync(command)];
             case 2:
-                _b.sent();
-                return [3 /*break*/, 8];
+                _a.sent();
+                console.log("Next.js project created successfully!");
+                return [3 /*break*/, 4];
             case 3:
-                console.log("Creating project with yarn");
-                return [4 /*yield*/, execAsync("yarn create vite ".concat(projectName, " --template react-ts"))];
-            case 4:
-                _b.sent();
-                return [3 /*break*/, 8];
-            case 5:
-                console.log("Creating project with pnpm");
-                return [4 /*yield*/, execAsync("pnpm create vite ".concat(projectName, " --template react-ts"))];
-            case 6:
-                _b.sent();
-                return [3 /*break*/, 8];
-            case 7: return [3 /*break*/, 8];
-            case 8:
-                console.log("React project created successfully!");
-                return [3 /*break*/, 10];
-            case 9:
-                error_2 = _b.sent();
+                error_2 = _a.sent();
                 console.error("An unexpected error occurred:", error_2);
-                return [3 /*break*/, 10];
-            case 10: return [2 /*return*/];
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
         }
     });
 }); };
-export var promptForOptions = function (args) { return __awaiter(void 0, void 0, void 0, function () {
+var createReactApp = function (options, path) { return __awaiter(void 0, void 0, void 0, function () {
+    var projectName, packageManager, _a, error_3;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                console.log("Creating React project...");
+                _b.label = 1;
+            case 1:
+                _b.trys.push([1, 17, , 18]);
+                projectName = options.projectName, packageManager = options.packageManager;
+                _a = packageManager;
+                switch (_a) {
+                    case "npm": return [3 /*break*/, 2];
+                    case "yarn": return [3 /*break*/, 7];
+                    case "pnpm": return [3 /*break*/, 12];
+                }
+                return [3 /*break*/, 15];
+            case 2:
+                console.log("Creating project with npm");
+                if (!path) return [3 /*break*/, 4];
+                return [4 /*yield*/, execAsync("cd ".concat(path, " && npm init vite@latest . -- --template react-ts"))];
+            case 3:
+                _b.sent();
+                return [3 /*break*/, 6];
+            case 4: return [4 /*yield*/, execAsync("npm init vite@latest ".concat(projectName, " -- --template react-ts"))];
+            case 5:
+                _b.sent();
+                _b.label = 6;
+            case 6: return [3 /*break*/, 16];
+            case 7:
+                console.log("Creating project with yarn");
+                if (!path) return [3 /*break*/, 9];
+                return [4 /*yield*/, execAsync("cd ".concat(path, " && yarn create vite . --template react-ts"))];
+            case 8:
+                _b.sent();
+                return [3 /*break*/, 11];
+            case 9: return [4 /*yield*/, execAsync("yarn create vite ".concat(projectName, " --template react-ts"))];
+            case 10:
+                _b.sent();
+                _b.label = 11;
+            case 11: return [3 /*break*/, 16];
+            case 12:
+                console.log("Creating project with pnpm");
+                if (!path) return [3 /*break*/, 14];
+                return [4 /*yield*/, execAsync("cd ".concat(path, " && pnpm create vite . --template react-ts"))];
+            case 13:
+                _b.sent();
+                _b.label = 14;
+            case 14: return [3 /*break*/, 16];
+            case 15: return [3 /*break*/, 16];
+            case 16:
+                console.log("React project created successfully!");
+                return [3 /*break*/, 18];
+            case 17:
+                error_3 = _b.sent();
+                console.error("An unexpected error occurred:", error_3);
+                return [3 /*break*/, 18];
+            case 18: return [2 /*return*/];
+        }
+    });
+}); };
+var promptForOptions = function (args) { return __awaiter(void 0, void 0, void 0, function () {
     var projectName, framework, tooling, packageManager, options;
     var _a, _b, _c;
     return __generator(this, function (_d) {
@@ -243,6 +268,135 @@ export var promptForOptions = function (args) { return __awaiter(void 0, void 0,
                     packageManager: (_c = PACAKGE_MANAGER_CHOICES.find(function (choice) { return choice.name === packageManager; })) === null || _c === void 0 ? void 0 : _c.value,
                 };
                 return [2 /*return*/, options];
+        }
+    });
+}); };
+var initializeMonorepo = function (options) { return __awaiter(void 0, void 0, void 0, function () {
+    var projectName, packageManager;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                projectName = options.projectName, packageManager = options.packageManager;
+                console.log("Initializing monorepo...");
+                if (!(packageManager === "pnpm")) return [3 /*break*/, 2];
+                return [4 /*yield*/, fs.writeFile(path.join(projectName, "pnpm-workspace.yaml"), "packages:\n        - 'packages/*'")];
+            case 1:
+                _a.sent();
+                _a.label = 2;
+            case 2: return [4 /*yield*/, fs.writeFile(path.join(projectName, ".gitignore"), "node_modules")];
+            case 3:
+                _a.sent();
+                return [4 /*yield*/, execAsync("cd ".concat(projectName, " && npm init -y"))];
+            case 4:
+                _a.sent();
+                return [4 /*yield*/, execAsync("cd ".concat(projectName, " && npm init -w ./packages/blockchain -y"))];
+            case 5:
+                _a.sent();
+                return [4 /*yield*/, execAsync("cd ".concat(projectName, " && npm init -w ./packages/site -y"))];
+            case 6:
+                _a.sent();
+                return [4 /*yield*/, fs.rm(path.join(projectName, "packages", "blockchain", "package.json"))];
+            case 7:
+                _a.sent();
+                return [4 /*yield*/, fs.rm(path.join(projectName, "packages", "site", "package.json"))];
+            case 8:
+                _a.sent();
+                return [4 /*yield*/, fs.rm(path.join(projectName, "node_modules"), { recursive: true })];
+            case 9:
+                _a.sent();
+                return [2 /*return*/];
+        }
+    });
+}); };
+var createHardhatProject = function (options) { return __awaiter(void 0, void 0, void 0, function () {
+    var projectName, framework;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                projectName = options.projectName, framework = options.framework;
+                return [4 /*yield*/, fs.mkdir(projectName)];
+            case 1:
+                _a.sent();
+                console.log("Creating a project with HardHat...");
+                return [4 /*yield*/, initializeMonorepo(options)];
+            case 2:
+                _a.sent();
+                return [4 /*yield*/, execAsync("git clone https://github.com/cxalem/hardhat-template.git ".concat(path.join(projectName, "packages", "blockchain")))];
+            case 3:
+                _a.sent();
+                if (!(framework === "nextjs")) return [3 /*break*/, 5];
+                return [4 /*yield*/, createNextApp(options, path.join(projectName, "packages", "site"))];
+            case 4:
+                _a.sent();
+                return [3 /*break*/, 7];
+            case 5: return [4 /*yield*/, createReactApp(options, path.join(projectName, "packages", "site"))];
+            case 6:
+                _a.sent();
+                _a.label = 7;
+            case 7: return [2 /*return*/];
+        }
+    });
+}); };
+var createFoundryProject = function (options) { return __awaiter(void 0, void 0, void 0, function () {
+    var projectName, framework;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                projectName = options.projectName, framework = options.framework;
+                return [4 /*yield*/, fs.mkdir(projectName)];
+            case 1:
+                _a.sent();
+                console.log("Creating a project with Foundry...");
+                return [4 /*yield*/, initializeMonorepo(options)];
+            case 2:
+                _a.sent();
+                if (!(framework === "nextjs")) return [3 /*break*/, 4];
+                return [4 /*yield*/, createNextApp(options, path.join(projectName, "packages", "site"))];
+            case 3:
+                _a.sent();
+                return [3 /*break*/, 6];
+            case 4: return [4 /*yield*/, createReactApp(options, path.join(projectName, "packages", "site"))];
+            case 5:
+                _a.sent();
+                _a.label = 6;
+            case 6: return [4 /*yield*/, execAsync("\n    cd ".concat(projectName, "/packages/blockchain && forge init . --no-commit\n    "))];
+            case 7:
+                _a.sent();
+                return [2 /*return*/];
+        }
+    });
+}); };
+export var createProject = function (args) { return __awaiter(void 0, void 0, void 0, function () {
+    var options, _a;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0: return [4 /*yield*/, promptForOptions(args)];
+            case 1:
+                options = _b.sent();
+                if (options.blockchain_tooling === "hardhat") {
+                    createHardhatProject(options);
+                    return [2 /*return*/];
+                }
+                if (options.blockchain_tooling === "foundry") {
+                    createFoundryProject(options);
+                    return [2 /*return*/];
+                }
+                _a = options.framework;
+                switch (_a) {
+                    case "nextjs": return [3 /*break*/, 2];
+                    case "react": return [3 /*break*/, 4];
+                }
+                return [3 /*break*/, 6];
+            case 2: return [4 /*yield*/, createNextApp(options)];
+            case 3:
+                _b.sent();
+                return [3 /*break*/, 7];
+            case 4: return [4 /*yield*/, createReactApp(options)];
+            case 5:
+                _b.sent();
+                return [3 /*break*/, 7];
+            case 6: return [3 /*break*/, 7];
+            case 7: return [2 /*return*/];
         }
     });
 }); };
