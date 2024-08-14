@@ -1,8 +1,5 @@
-import inquirer from "inquirer";
 import { exec } from "child_process";
 import { promises as fs } from "fs";
-import path from "path";
-import util from "util";
 import {
   BLOCKCHAIN_TOOLING_CHOICES,
   FRAMEWORK_CHOICES,
@@ -10,6 +7,9 @@ import {
 } from "../constants/index.js";
 import { createReactApp } from "./vite.helpers.js";
 import { createNextApp } from "./next.helpers.js";
+import path from "path";
+import util from "util";
+import inquirer from "inquirer";
 
 export const execAsync = util.promisify(exec);
 
