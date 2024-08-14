@@ -1,12 +1,12 @@
 import path from "path";
+import { promises as fs } from "fs";
 import {
   createWagmiConfigFile,
+  execAsync,
   pathOrProjectName,
   updatePackageJsonDependencies,
   usePackageManager,
-} from "./helpers.js";
-import { promises as fs } from "fs";
-import { execAsync } from "./index.js";
+} from "./index.js";
 
 export const createNextApp = async (
   options: ProjectOptions,
