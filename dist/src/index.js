@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import { Command } from "commander";
-import { createProject } from "./utils/index.js";
+import { createProject } from "./utils/helpers.js";
 function main() {
     return __awaiter(this, void 0, void 0, function () {
         var program;

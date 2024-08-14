@@ -1,76 +1,66 @@
-import inquirer from "inquirer";
 import { exec } from "child_process";
 import { promises as fs } from "fs";
-import { Template } from "../../types.js";
-import { TEMPLATES } from "../templates.js";
+import {
+  BLOCKCHAIN_TOOLING_CHOICES,
+  FRAMEWORK_CHOICES,
+  PACAKGE_MANAGER_CHOICES,
+} from "../constants/index.js";
+import { createReactApp } from "./vite.helpers.js";
+import { createNextApp } from "./next.helpers.js";
 import path from "path";
 import util from "util";
+import inquirer from "inquirer";
 
-const execAsync = util.promisify(exec);
+export const execAsync = util.promisify(exec);
 
-const validateTemplateExists = (input: string): void => {
-  if (!input) {
-    throw new Error("Template not found");
-  }
+const promptForFramework = async (): Promise<string> => {
+  const frameworkChoice = FRAMEWORK_CHOICES.map((choice) => choice.name);
+  const { framework }: { framework: string } = await inquirer.prompt([
+    {
+      type: "list",
+      name: "framework",
+      message: "Please select the framework you want to use:",
+      choices: frameworkChoice,
+    },
+  ]);
+  console.log(`Selected framework: ${framework}`);
+
+  return framework;
 };
 
-export const updatePackageJson = async (
-  projectPath: string,
-  packageName: string
-): Promise<void> => {
-  const packageJsonPath = path.join(projectPath, "package.json");
-  const packageJson = await fs.readFile(packageJsonPath, "utf-8");
-  const newPackageJson = packageJson.replace(
-    packageName,
-    path.basename(projectPath)
+const promptForTooling = async (): Promise<string> => {
+  const toolingChoice = BLOCKCHAIN_TOOLING_CHOICES.map((choice) => choice.name);
+  const { tooling }: { tooling: string } = await inquirer.prompt([
+    {
+      type: "list",
+      name: "tooling",
+      message: "Would you like to use HardHat or Foundry?",
+      choices: toolingChoice,
+    },
+  ]);
+  console.log(`Selected tooling: ${tooling}`);
+
+  return tooling;
+};
+
+const promptForPackageManager = async (): Promise<string> => {
+  const packageManagerChoice = PACAKGE_MANAGER_CHOICES.map(
+    (choice) => choice.name
   );
-  await fs.writeFile(packageJsonPath, newPackageJson);
+  const { packageManager }: { packageManager: string } = await inquirer.prompt([
+    {
+      type: "list",
+      name: "packageManager",
+      message: "Please select the package manager you want to use:",
+      choices: packageManagerChoice,
+    },
+  ]);
+  console.log(`Selected package manager: ${packageManager}`);
+
+  return packageManager;
 };
 
-export const removeGitFolder = async (projectPath: string): Promise<void> => {
-  const gitPath = path.join(projectPath, ".git");
-  try {
-    await fs.rm(gitPath, { recursive: true });
-  } catch (err) {
-    console.error("Error removing .git folder:", err);
-  }
-};
-
-export const setupGitRepository = async (
-  projectPath: string
-): Promise<void> => {
-  await execAsync(
-    `cd ${projectPath} && git init && git add . && git commit -m "Initial commit"`
-  );
-  console.log("Git repository initialized and first commit made.");
-};
-
-export const cloneAndSetupTemplate = async (
-  template: Template,
-  projectPath: string
-): Promise<void> => {
-  validateTemplateExists(template.id);
-
-  await execAsync(`git clone ${template.repo_url} ${projectPath}`);
-  await updatePackageJson(projectPath, template.packageName);
-  await removeGitFolder(projectPath);
-  await setupGitRepository(projectPath);
-};
-
-export const cloneTemplate = async (
-  templateId: string,
-  projectPath: string
-): Promise<void> => {
-  const template = TEMPLATES.find((t) => t.id === templateId) as Template;
-  if (!template) {
-    throw new Error("Template not found");
-  }
-  await cloneAndSetupTemplate(template, projectPath);
-};
-
-export const promptForProjectDetails = async (
-  args: string
-): Promise<string> => {
+const promptForProjectDetails = async (args: string): Promise<string> => {
   if (!args) {
     const { projectName } = await inquirer.prompt([
       {
@@ -86,50 +76,56 @@ export const promptForProjectDetails = async (
   return args;
 };
 
-export const promptForTemplate = async (): Promise<Template> => {
-  const { template }: { template: string } = await inquirer.prompt([
-    {
-      type: "list",
-      name: "template",
-      message: "Please specify a template: ",
-      choices: TEMPLATES.map((template) => template.name),
-    },
-  ]);
-  const selectedTemplate = TEMPLATES.find(
-    (t) => t.name === template
-  ) as Template;
-  console.log("Creating project with template:", selectedTemplate.name);
-  return selectedTemplate;
+const promptForOptions = async (args: string) => {
+  const projectName = await promptForProjectDetails(args);
+  const framework = await promptForFramework();
+  const tooling = await promptForTooling();
+  const packageManager = await promptForPackageManager();
+
+  const options = {
+    projectName: projectName,
+    framework: FRAMEWORK_CHOICES.find((choice) => choice.name === framework)
+      ?.value,
+    blockchain_tooling: BLOCKCHAIN_TOOLING_CHOICES.find(
+      (choice) => choice.name === tooling
+    )?.value,
+    packageManager: PACAKGE_MANAGER_CHOICES.find(
+      (choice) => choice.name === packageManager
+    )?.value!,
+  };
+
+  return options;
 };
 
-export const promptForMonorepo = async (): Promise<boolean> => {
-  const { monorepo }: { monorepo: boolean } = await inquirer.prompt([
-    {
-      type: "confirm",
-      name: "monorepo",
-      message: "Would you like to use a monorepo with HardHat?",
-    },
-  ]);
-  return monorepo;
-};
+const initializeMonorepo = async (options: ProjectOptions) => {
+  const { projectName, packageManager } = options;
+  console.log("Initializing monorepo...");
 
-export const createMonorepo = async (
-  projectName: string,
-  template: Template
-): Promise<void> => {
-  await fs.mkdir(projectName);
+  if (packageManager === "pnpm") {
+    await fs.writeFile(
+      path.join(projectName, "pnpm-workspace.yaml"),
+      `packages:
+        - 'packages/*'`
+    );
+  }
+
+  await fs.writeFile(path.join(projectName, ".gitignore"), `node_modules`);
   await execAsync(`cd ${projectName} && npm init -y`);
   await execAsync(`cd ${projectName} && npm init -w ./packages/blockchain -y`);
   await execAsync(`cd ${projectName} && npm init -w ./packages/site -y`);
 
   await fs.rm(path.join(projectName, "packages", "blockchain", "package.json"));
   await fs.rm(path.join(projectName, "packages", "site", "package.json"));
-
   await fs.rm(path.join(projectName, "node_modules"), { recursive: true });
-  await cloneTemplate(template.id, path.join(projectName, "packages", "site"));
+};
 
-  await createGitIgnore(projectName);
+const createHardhatProject = async (options: ProjectOptions) => {
+  const { projectName, framework } = options;
+  await fs.mkdir(projectName);
 
+  console.log("Creating a project with HardHat...");
+
+  await initializeMonorepo(options);
   await execAsync(
     `git clone https://github.com/cxalem/hardhat-template.git ${path.join(
       projectName,
@@ -137,18 +133,111 @@ export const createMonorepo = async (
       "blockchain"
     )}`
   );
-  await fs.rm(path.join(projectName, "packages", "blockchain", ".git"), {
-    recursive: true,
-  });
+
+  if (framework === "nextjs") {
+    await createNextApp(options, path.join(projectName, "packages", "site"));
+  } else {
+    await createReactApp(options, path.join(projectName, "packages", "site"));
+  }
 };
 
-export const createGitIgnore = async (projectPath: string): Promise<void> => {
-  const gitIgnorePath = path.join(projectPath, ".gitignore");
-  const gitIgnoreContent = `node_modules\n`;
+const createFoundryProject = async (options: ProjectOptions) => {
+  const { projectName, framework } = options;
+  await fs.mkdir(projectName);
 
-  try {
-    await fs.writeFile(gitIgnorePath, gitIgnoreContent);
-  } catch (err) {
-    console.error("Error creating .gitignore file:", err);
+  console.log("Creating a project with Foundry...");
+
+  await initializeMonorepo(options);
+  if (framework === "nextjs") {
+    await createNextApp(options, path.join(projectName, "packages", "site"));
+  } else {
+    await createReactApp(options, path.join(projectName, "packages", "site"));
+  }
+
+  await execAsync(`
+    cd ${projectName}/packages/blockchain && forge init . --no-commit
+    `);
+};
+
+export const pathOrProjectName = (
+  projectName: string,
+  projectPath?: string
+) => {
+  return projectPath ? projectPath : projectName;
+};
+
+export const updatePackageJsonDependencies = async (
+  dependencies: Record<string, string>,
+  projectPath: string
+) => {
+  const packageJsonPath = path.join(projectPath, "package.json");
+  const packageJsonContent = await fs.readFile(packageJsonPath, "utf-8");
+  const packageJson = JSON.parse(packageJsonContent);
+
+  packageJson.dependencies = {
+    ...packageJson.dependencies,
+    ...dependencies,
+  };
+
+  const newPackageJsonContent = JSON.stringify(packageJson, null, 2);
+  await fs.writeFile(packageJsonPath, newPackageJsonContent, "utf-8");
+
+  console.log("Dependencies added to package.json");
+};
+
+export const createWagmiConfigFile = async (projectPath: string) => {
+  await fs.writeFile(
+    path.join(projectPath, "wagmi.config.ts"),
+    `
+import { http, createConfig } from "wagmi";
+import { lineaTestnet } from "wagmi/chains";
+import { metaMask } from "wagmi/connectors";
+
+export const config = createConfig({
+  chains: [lineaTestnet],
+  connectors: [metaMask()],
+  transports: {
+    [lineaTestnet.id]: http(),
+  },
+});
+`
+  );
+};
+
+export const usePackageManager = (packageManager: string) => {
+  switch (packageManager) {
+    case "npm":
+      return "--use-npm";
+    case "yarn":
+      return "--use-yarn";
+    case "pnpm":
+      return "--use-pnpm";
+    default:
+      return "--use-npm";
+  }
+};
+
+export const createProject = async (args: string) => {
+  const options = await promptForOptions(args);
+
+  if (options.blockchain_tooling === "hardhat") {
+    createHardhatProject(options);
+    return;
+  }
+
+  if (options.blockchain_tooling === "foundry") {
+    createFoundryProject(options);
+    return;
+  }
+
+  switch (options.framework) {
+    case "nextjs":
+      await createNextApp(options);
+      break;
+    case "react":
+      await createReactApp(options);
+      break;
+    default:
+      break;
   }
 };
