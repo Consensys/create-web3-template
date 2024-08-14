@@ -36,3 +36,18 @@ export var PACAKGE_MANAGER_CHOICES = [
         value: "pnpm",
     },
 ];
+export var NPM_COMMAND = function (projectName, path) {
+    return path
+        ? "cd ".concat(path, " && npm init vite@latest . -- --template react-ts")
+        : "npm init vite@latest ".concat(projectName, " -- --template react-ts");
+};
+export var YARN_COMMAND = function (projectName, path) {
+    return path
+        ? "cd ".concat(path, " && yarn create vite . --template react-ts")
+        : "yarn create vite ".concat(projectName, " --template react-ts");
+};
+export var PNPM_COMMAND = function (projectName, path) {
+    return path
+        ? "cd ".concat(path, " && pnpm create vite . --template react-ts")
+        : "pnpm create vite ".concat(projectName, " --template react-ts");
+};

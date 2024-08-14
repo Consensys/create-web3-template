@@ -1,3 +1,14 @@
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -34,13 +45,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import { exec } from "child_process";
-import util from "util";
 import { BLOCKCHAIN_TOOLING_CHOICES, FRAMEWORK_CHOICES, PACAKGE_MANAGER_CHOICES, } from "../constants/index.js";
 import { promises as fs } from "fs";
 import inquirer from "inquirer";
 import path from "path";
-var execAsync = util.promisify(exec);
+import { execAsync } from "./index.js";
+import { createReactApp } from "./vite.helpers.js";
+import { createNextApp } from "./next.helpers.js";
 var promptForFramework = function () { return __awaiter(void 0, void 0, void 0, function () {
     var frameworkChoice, framework;
     return __generator(this, function (_a) {
@@ -104,18 +115,6 @@ var promptForPackageManager = function () { return __awaiter(void 0, void 0, voi
         }
     });
 }); };
-var usePackageManager = function (packageManager) {
-    switch (packageManager) {
-        case "npm":
-            return "--use-npm";
-        case "yarn":
-            return "--use-yarn";
-        case "pnpm":
-            return "--use-pnpm";
-        default:
-            return "--use-npm";
-    }
-};
 var promptForProjectDetails = function (args) { return __awaiter(void 0, void 0, void 0, function () {
     var projectName;
     return __generator(this, function (_a) {
@@ -135,112 +134,6 @@ var promptForProjectDetails = function (args) { return __awaiter(void 0, void 0,
                 console.log("Creating project with name:", projectName);
                 return [2 /*return*/, projectName];
             case 2: return [2 /*return*/, args];
-        }
-    });
-}); };
-var createDirectory = function (projectName) { return __awaiter(void 0, void 0, void 0, function () {
-    var error_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, fs.mkdir(projectName)];
-            case 1:
-                _a.sent();
-                return [3 /*break*/, 3];
-            case 2:
-                error_1 = _a.sent();
-                console.error("An unexpected error occurred:", error_1);
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
-        }
-    });
-}); };
-var pathOrProjectName = function (projectName, path) {
-    return path ? path : projectName;
-};
-var createNextApp = function (options, path) { return __awaiter(void 0, void 0, void 0, function () {
-    var projectName, packageManager, command, error_2;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                console.log("Creating Next.js project...");
-                _a.label = 1;
-            case 1:
-                _a.trys.push([1, 3, , 4]);
-                projectName = options.projectName, packageManager = options.packageManager;
-                command = "npx create-next-app ".concat(pathOrProjectName(projectName, path), " --ts --tailwind --eslint --app --src-dir --import-alias \"@/*\" ").concat(usePackageManager(packageManager));
-                return [4 /*yield*/, execAsync(command)];
-            case 2:
-                _a.sent();
-                console.log("Next.js project created successfully!");
-                return [3 /*break*/, 4];
-            case 3:
-                error_2 = _a.sent();
-                console.error("An unexpected error occurred:", error_2);
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
-        }
-    });
-}); };
-var createReactApp = function (options, path) { return __awaiter(void 0, void 0, void 0, function () {
-    var projectName, packageManager, _a, error_3;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
-            case 0:
-                console.log("Creating React project...");
-                _b.label = 1;
-            case 1:
-                _b.trys.push([1, 17, , 18]);
-                projectName = options.projectName, packageManager = options.packageManager;
-                _a = packageManager;
-                switch (_a) {
-                    case "npm": return [3 /*break*/, 2];
-                    case "yarn": return [3 /*break*/, 7];
-                    case "pnpm": return [3 /*break*/, 12];
-                }
-                return [3 /*break*/, 15];
-            case 2:
-                console.log("Creating project with npm");
-                if (!path) return [3 /*break*/, 4];
-                return [4 /*yield*/, execAsync("cd ".concat(path, " && npm init vite@latest . -- --template react-ts"))];
-            case 3:
-                _b.sent();
-                return [3 /*break*/, 6];
-            case 4: return [4 /*yield*/, execAsync("npm init vite@latest ".concat(projectName, " -- --template react-ts"))];
-            case 5:
-                _b.sent();
-                _b.label = 6;
-            case 6: return [3 /*break*/, 16];
-            case 7:
-                console.log("Creating project with yarn");
-                if (!path) return [3 /*break*/, 9];
-                return [4 /*yield*/, execAsync("cd ".concat(path, " && yarn create vite . --template react-ts"))];
-            case 8:
-                _b.sent();
-                return [3 /*break*/, 11];
-            case 9: return [4 /*yield*/, execAsync("yarn create vite ".concat(projectName, " --template react-ts"))];
-            case 10:
-                _b.sent();
-                _b.label = 11;
-            case 11: return [3 /*break*/, 16];
-            case 12:
-                console.log("Creating project with pnpm");
-                if (!path) return [3 /*break*/, 14];
-                return [4 /*yield*/, execAsync("cd ".concat(path, " && pnpm create vite . --template react-ts"))];
-            case 13:
-                _b.sent();
-                _b.label = 14;
-            case 14: return [3 /*break*/, 16];
-            case 15: return [3 /*break*/, 16];
-            case 16:
-                console.log("React project created successfully!");
-                return [3 /*break*/, 18];
-            case 17:
-                error_3 = _b.sent();
-                console.error("An unexpected error occurred:", error_3);
-                return [3 /*break*/, 18];
-            case 18: return [2 /*return*/];
         }
     });
 }); };
@@ -366,6 +259,51 @@ var createFoundryProject = function (options) { return __awaiter(void 0, void 0,
         }
     });
 }); };
+export var pathOrProjectName = function (projectName, projectPath) {
+    return projectPath ? projectPath : projectName;
+};
+export var updatePackageJsonDependencies = function (dependencies, projectPath) { return __awaiter(void 0, void 0, void 0, function () {
+    var packageJsonPath, packageJsonContent, packageJson, newPackageJsonContent;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                packageJsonPath = path.join(projectPath, "package.json");
+                return [4 /*yield*/, fs.readFile(packageJsonPath, "utf-8")];
+            case 1:
+                packageJsonContent = _a.sent();
+                packageJson = JSON.parse(packageJsonContent);
+                packageJson.dependencies = __assign(__assign({}, packageJson.dependencies), dependencies);
+                newPackageJsonContent = JSON.stringify(packageJson, null, 2);
+                return [4 /*yield*/, fs.writeFile(packageJsonPath, newPackageJsonContent, "utf-8")];
+            case 2:
+                _a.sent();
+                console.log("Dependencies added to package.json");
+                return [2 /*return*/];
+        }
+    });
+}); };
+export var createWagmiConfigFile = function (projectPath) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, fs.writeFile(path.join(projectPath, "wagmi.config.ts"), "\nimport { http, createConfig } from \"wagmi\";\nimport { lineaTestnet } from \"wagmi/chains\";\nimport { metaMask } from \"wagmi/connectors\";\n\nexport const config = createConfig({\n  chains: [lineaTestnet],\n  connectors: [metaMask()],\n  transports: {\n    [lineaTestnet.id]: http(),\n  },\n});\n")];
+            case 1:
+                _a.sent();
+                return [2 /*return*/];
+        }
+    });
+}); };
+export var usePackageManager = function (packageManager) {
+    switch (packageManager) {
+        case "npm":
+            return "--use-npm";
+        case "yarn":
+            return "--use-yarn";
+        case "pnpm":
+            return "--use-pnpm";
+        default:
+            return "--use-npm";
+    }
+};
 export var createProject = function (args) { return __awaiter(void 0, void 0, void 0, function () {
     var options, _a;
     return __generator(this, function (_b) {
