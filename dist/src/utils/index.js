@@ -1,3 +1,14 @@
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -37,218 +48,295 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 import inquirer from "inquirer";
 import { exec } from "child_process";
 import { promises as fs } from "fs";
-import { TEMPLATES } from "../constants/templates.js";
 import path from "path";
 import util from "util";
-var execAsync = util.promisify(exec);
-var validateTemplateExists = function (input) {
-    if (!input) {
-        throw new Error("Template not found");
-    }
-};
-export var updatePackageJson = function (projectPath, packageName) { return __awaiter(void 0, void 0, void 0, function () {
-    var packageJsonPath, packageJsonContent, packageJson, newPackageJsonContent, error_1;
+import { BLOCKCHAIN_TOOLING_CHOICES, FRAMEWORK_CHOICES, PACAKGE_MANAGER_CHOICES, } from "../constants/index.js";
+import { createReactApp } from "./vite.helpers.js";
+import { createNextApp } from "./next.helpers.js";
+export var execAsync = util.promisify(exec);
+var promptForFramework = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var frameworkChoice, framework;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 3, , 4]);
-                if (!projectPath || !packageName) {
-                    throw new Error("Invalid input: projectPath and packageName are required");
-                }
+                frameworkChoice = FRAMEWORK_CHOICES.map(function (choice) { return choice.name; });
+                return [4 /*yield*/, inquirer.prompt([
+                        {
+                            type: "list",
+                            name: "framework",
+                            message: "Please select the framework you want to use:",
+                            choices: frameworkChoice,
+                        },
+                    ])];
+            case 1:
+                framework = (_a.sent()).framework;
+                console.log("Selected framework: ".concat(framework));
+                return [2 /*return*/, framework];
+        }
+    });
+}); };
+var promptForTooling = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var toolingChoice, tooling;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                toolingChoice = BLOCKCHAIN_TOOLING_CHOICES.map(function (choice) { return choice.name; });
+                return [4 /*yield*/, inquirer.prompt([
+                        {
+                            type: "list",
+                            name: "tooling",
+                            message: "Would you like to use HardHat or Foundry?",
+                            choices: toolingChoice,
+                        },
+                    ])];
+            case 1:
+                tooling = (_a.sent()).tooling;
+                console.log("Selected tooling: ".concat(tooling));
+                return [2 /*return*/, tooling];
+        }
+    });
+}); };
+var promptForPackageManager = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var packageManagerChoice, packageManager;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                packageManagerChoice = PACAKGE_MANAGER_CHOICES.map(function (choice) { return choice.name; });
+                return [4 /*yield*/, inquirer.prompt([
+                        {
+                            type: "list",
+                            name: "packageManager",
+                            message: "Please select the package manager you want to use:",
+                            choices: packageManagerChoice,
+                        },
+                    ])];
+            case 1:
+                packageManager = (_a.sent()).packageManager;
+                console.log("Selected package manager: ".concat(packageManager));
+                return [2 /*return*/, packageManager];
+        }
+    });
+}); };
+var promptForProjectDetails = function (args) { return __awaiter(void 0, void 0, void 0, function () {
+    var projectName;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                if (!!args) return [3 /*break*/, 2];
+                return [4 /*yield*/, inquirer.prompt([
+                        {
+                            type: "input",
+                            name: "projectName",
+                            message: "Please specify a name for your project: ",
+                            validate: function (input) { return (input ? true : "Project name cannot be empty"); },
+                        },
+                    ])];
+            case 1:
+                projectName = (_a.sent()).projectName;
+                console.log("Creating project with name:", projectName);
+                return [2 /*return*/, projectName];
+            case 2: return [2 /*return*/, args];
+        }
+    });
+}); };
+var promptForOptions = function (args) { return __awaiter(void 0, void 0, void 0, function () {
+    var projectName, framework, tooling, packageManager, options;
+    var _a, _b, _c;
+    return __generator(this, function (_d) {
+        switch (_d.label) {
+            case 0: return [4 /*yield*/, promptForProjectDetails(args)];
+            case 1:
+                projectName = _d.sent();
+                return [4 /*yield*/, promptForFramework()];
+            case 2:
+                framework = _d.sent();
+                return [4 /*yield*/, promptForTooling()];
+            case 3:
+                tooling = _d.sent();
+                return [4 /*yield*/, promptForPackageManager()];
+            case 4:
+                packageManager = _d.sent();
+                options = {
+                    projectName: projectName,
+                    framework: (_a = FRAMEWORK_CHOICES.find(function (choice) { return choice.name === framework; })) === null || _a === void 0 ? void 0 : _a.value,
+                    blockchain_tooling: (_b = BLOCKCHAIN_TOOLING_CHOICES.find(function (choice) { return choice.name === tooling; })) === null || _b === void 0 ? void 0 : _b.value,
+                    packageManager: (_c = PACAKGE_MANAGER_CHOICES.find(function (choice) { return choice.name === packageManager; })) === null || _c === void 0 ? void 0 : _c.value,
+                };
+                return [2 /*return*/, options];
+        }
+    });
+}); };
+var initializeMonorepo = function (options) { return __awaiter(void 0, void 0, void 0, function () {
+    var projectName, packageManager;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                projectName = options.projectName, packageManager = options.packageManager;
+                console.log("Initializing monorepo...");
+                if (!(packageManager === "pnpm")) return [3 /*break*/, 2];
+                return [4 /*yield*/, fs.writeFile(path.join(projectName, "pnpm-workspace.yaml"), "packages:\n        - 'packages/*'")];
+            case 1:
+                _a.sent();
+                _a.label = 2;
+            case 2: return [4 /*yield*/, fs.writeFile(path.join(projectName, ".gitignore"), "node_modules")];
+            case 3:
+                _a.sent();
+                return [4 /*yield*/, execAsync("cd ".concat(projectName, " && npm init -y"))];
+            case 4:
+                _a.sent();
+                return [4 /*yield*/, execAsync("cd ".concat(projectName, " && npm init -w ./packages/blockchain -y"))];
+            case 5:
+                _a.sent();
+                return [4 /*yield*/, execAsync("cd ".concat(projectName, " && npm init -w ./packages/site -y"))];
+            case 6:
+                _a.sent();
+                return [4 /*yield*/, fs.rm(path.join(projectName, "packages", "blockchain", "package.json"))];
+            case 7:
+                _a.sent();
+                return [4 /*yield*/, fs.rm(path.join(projectName, "packages", "site", "package.json"))];
+            case 8:
+                _a.sent();
+                return [4 /*yield*/, fs.rm(path.join(projectName, "node_modules"), { recursive: true })];
+            case 9:
+                _a.sent();
+                return [2 /*return*/];
+        }
+    });
+}); };
+var createHardhatProject = function (options) { return __awaiter(void 0, void 0, void 0, function () {
+    var projectName, framework;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                projectName = options.projectName, framework = options.framework;
+                return [4 /*yield*/, fs.mkdir(projectName)];
+            case 1:
+                _a.sent();
+                console.log("Creating a project with HardHat...");
+                return [4 /*yield*/, initializeMonorepo(options)];
+            case 2:
+                _a.sent();
+                return [4 /*yield*/, execAsync("git clone https://github.com/cxalem/hardhat-template.git ".concat(path.join(projectName, "packages", "blockchain")))];
+            case 3:
+                _a.sent();
+                if (!(framework === "nextjs")) return [3 /*break*/, 5];
+                return [4 /*yield*/, createNextApp(options, path.join(projectName, "packages", "site"))];
+            case 4:
+                _a.sent();
+                return [3 /*break*/, 7];
+            case 5: return [4 /*yield*/, createReactApp(options, path.join(projectName, "packages", "site"))];
+            case 6:
+                _a.sent();
+                _a.label = 7;
+            case 7: return [2 /*return*/];
+        }
+    });
+}); };
+var createFoundryProject = function (options) { return __awaiter(void 0, void 0, void 0, function () {
+    var projectName, framework;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                projectName = options.projectName, framework = options.framework;
+                return [4 /*yield*/, fs.mkdir(projectName)];
+            case 1:
+                _a.sent();
+                console.log("Creating a project with Foundry...");
+                return [4 /*yield*/, initializeMonorepo(options)];
+            case 2:
+                _a.sent();
+                if (!(framework === "nextjs")) return [3 /*break*/, 4];
+                return [4 /*yield*/, createNextApp(options, path.join(projectName, "packages", "site"))];
+            case 3:
+                _a.sent();
+                return [3 /*break*/, 6];
+            case 4: return [4 /*yield*/, createReactApp(options, path.join(projectName, "packages", "site"))];
+            case 5:
+                _a.sent();
+                _a.label = 6;
+            case 6: return [4 /*yield*/, execAsync("\n    cd ".concat(projectName, "/packages/blockchain && forge init . --no-commit\n    "))];
+            case 7:
+                _a.sent();
+                return [2 /*return*/];
+        }
+    });
+}); };
+export var pathOrProjectName = function (projectName, projectPath) {
+    return projectPath ? projectPath : projectName;
+};
+export var updatePackageJsonDependencies = function (dependencies, projectPath) { return __awaiter(void 0, void 0, void 0, function () {
+    var packageJsonPath, packageJsonContent, packageJson, newPackageJsonContent;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
                 packageJsonPath = path.join(projectPath, "package.json");
                 return [4 /*yield*/, fs.readFile(packageJsonPath, "utf-8")];
             case 1:
                 packageJsonContent = _a.sent();
                 packageJson = JSON.parse(packageJsonContent);
-                packageJson.name = path.basename(projectPath);
+                packageJson.dependencies = __assign(__assign({}, packageJson.dependencies), dependencies);
                 newPackageJsonContent = JSON.stringify(packageJson, null, 2);
-                return [4 /*yield*/, fs.writeFile(packageJsonPath, newPackageJsonContent)];
+                return [4 /*yield*/, fs.writeFile(packageJsonPath, newPackageJsonContent, "utf-8")];
             case 2:
                 _a.sent();
-                console.log("Package name updated to '".concat(packageJson.name, "' in ").concat(packageJsonPath));
-                return [2 /*return*/, packageJson.name];
-            case 3:
-                error_1 = _a.sent();
-                console.error("updatePackageJson: Failed to update package.json: ".concat(error_1));
-                throw error_1; // Re-throw the error to ensure the caller is aware of the failure
-            case 4: return [2 /*return*/];
-        }
-    });
-}); };
-export var removeGitFolder = function (projectPath) { return __awaiter(void 0, void 0, void 0, function () {
-    var gitPath, err_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                gitPath = path.join(projectPath, ".git");
-                _a.label = 1;
-            case 1:
-                _a.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, fs.rm(gitPath, { recursive: true })];
-            case 2:
-                _a.sent();
-                return [2 /*return*/, true];
-            case 3:
-                err_1 = _a.sent();
-                console.error("Error removing .git folder:", err_1);
-                return [2 /*return*/, err_1];
-            case 4: return [2 /*return*/];
-        }
-    });
-}); };
-export var setupGitRepository = function (projectPath) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, execAsync("cd ".concat(projectPath, " && git init && git add . && git commit -m \"Initial commit\""))];
-            case 1:
-                _a.sent();
-                console.log("Git repository initialized and first commit made.");
+                console.log("Dependencies added to package.json");
                 return [2 /*return*/];
         }
     });
 }); };
-export var cloneAndSetupTemplate = function (template, projectPath) { return __awaiter(void 0, void 0, void 0, function () {
-    var error_2;
+export var createWagmiConfigFile = function (projectPath) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 5, , 6]);
-                validateTemplateExists(template.id);
-                return [4 /*yield*/, execAsync("git clone ".concat(template.repo_url, " ").concat(projectPath))];
+            case 0: return [4 /*yield*/, fs.writeFile(path.join(projectPath, "wagmi.config.ts"), "\nimport { http, createConfig } from \"wagmi\";\nimport { lineaTestnet } from \"wagmi/chains\";\nimport { metaMask } from \"wagmi/connectors\";\n\nexport const config = createConfig({\n  chains: [lineaTestnet],\n  connectors: [metaMask()],\n  transports: {\n    [lineaTestnet.id]: http(),\n  },\n});\n")];
             case 1:
                 _a.sent();
-                return [4 /*yield*/, updatePackageJson(projectPath, template.packageName)];
-            case 2:
-                _a.sent();
-                return [4 /*yield*/, removeGitFolder(projectPath)];
-            case 3:
-                _a.sent();
-                return [4 /*yield*/, setupGitRepository(projectPath)];
-            case 4:
-                _a.sent();
-                return [3 /*break*/, 6];
-            case 5:
-                error_2 = _a.sent();
-                console.error("cloneAndSetupTemplate: Error setting up the template: ".concat(error_2));
-                throw error_2;
-            case 6: return [2 /*return*/];
+                return [2 /*return*/];
         }
     });
 }); };
-export var cloneTemplate = function (templateId, projectPath) { return __awaiter(void 0, void 0, void 0, function () {
-    var template;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                template = TEMPLATES.find(function (t) { return t.id === templateId; });
-                if (!template) {
-                    throw new Error("Template not found");
+export var usePackageManager = function (packageManager) {
+    switch (packageManager) {
+        case "npm":
+            return "--use-npm";
+        case "yarn":
+            return "--use-yarn";
+        case "pnpm":
+            return "--use-pnpm";
+        default:
+            return "--use-npm";
+    }
+};
+export var createProject = function (args) { return __awaiter(void 0, void 0, void 0, function () {
+    var options, _a;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0: return [4 /*yield*/, promptForOptions(args)];
+            case 1:
+                options = _b.sent();
+                if (options.blockchain_tooling === "hardhat") {
+                    createHardhatProject(options);
+                    return [2 /*return*/];
                 }
-                return [4 /*yield*/, cloneAndSetupTemplate(template, projectPath)];
-            case 1:
-                _a.sent();
-                return [2 /*return*/, template];
-        }
-    });
-}); };
-export var promptForTemplate = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var template, selectedTemplate;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, inquirer.prompt([
-                    {
-                        type: "list",
-                        name: "template",
-                        message: "Please specify a template: ",
-                        choices: TEMPLATES.map(function (template) { return template.name; }),
-                    },
-                ])];
-            case 1:
-                template = (_a.sent()).template;
-                selectedTemplate = TEMPLATES.find(function (t) { return t.name === template; });
-                console.log("Creating project with template:", selectedTemplate.name);
-                return [2 /*return*/, selectedTemplate];
-        }
-    });
-}); };
-export var promptForMonorepo = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var monorepo;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, inquirer.prompt([
-                    {
-                        type: "confirm",
-                        name: "monorepo",
-                        message: "Would you like to use a monorepo with HardHat?",
-                    },
-                ])];
-            case 1:
-                monorepo = (_a.sent()).monorepo;
-                return [2 /*return*/, monorepo];
-        }
-    });
-}); };
-export var createMonorepo = function (projectName, template) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, fs.mkdir(projectName)];
-            case 1:
-                _a.sent();
-                return [4 /*yield*/, execAsync("cd ".concat(projectName, " && npm init -y"))];
-            case 2:
-                _a.sent();
-                return [4 /*yield*/, execAsync("cd ".concat(projectName, " && npm init -w ./packages/blockchain -y"))];
+                if (options.blockchain_tooling === "foundry") {
+                    createFoundryProject(options);
+                    return [2 /*return*/];
+                }
+                _a = options.framework;
+                switch (_a) {
+                    case "nextjs": return [3 /*break*/, 2];
+                    case "react": return [3 /*break*/, 4];
+                }
+                return [3 /*break*/, 6];
+            case 2: return [4 /*yield*/, createNextApp(options)];
             case 3:
-                _a.sent();
-                return [4 /*yield*/, execAsync("cd ".concat(projectName, " && npm init -w ./packages/site -y"))];
-            case 4:
-                _a.sent();
-                return [4 /*yield*/, fs.rm(path.join(projectName, "packages", "blockchain", "package.json"))];
+                _b.sent();
+                return [3 /*break*/, 7];
+            case 4: return [4 /*yield*/, createReactApp(options)];
             case 5:
-                _a.sent();
-                return [4 /*yield*/, fs.rm(path.join(projectName, "packages", "site", "package.json"))];
-            case 6:
-                _a.sent();
-                return [4 /*yield*/, fs.rm(path.join(projectName, "node_modules"), { recursive: true })];
-            case 7:
-                _a.sent();
-                return [4 /*yield*/, cloneTemplate(template.id, path.join(projectName, "packages", "site"))];
-            case 8:
-                _a.sent();
-                return [4 /*yield*/, createGitIgnore(projectName)];
-            case 9:
-                _a.sent();
-                return [4 /*yield*/, execAsync("git clone https://github.com/cxalem/hardhat-template.git ".concat(path.join(projectName, "packages", "blockchain")))];
-            case 10:
-                _a.sent();
-                return [4 /*yield*/, fs.rm(path.join(projectName, "packages", "blockchain", ".git"), {
-                        recursive: true,
-                    })];
-            case 11:
-                _a.sent();
-                return [2 /*return*/];
-        }
-    });
-}); };
-export var createGitIgnore = function (projectPath) { return __awaiter(void 0, void 0, void 0, function () {
-    var gitIgnorePath, gitIgnoreContent, err_2;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                gitIgnorePath = path.join(projectPath, ".gitignore");
-                gitIgnoreContent = "node_modules\n";
-                _a.label = 1;
-            case 1:
-                _a.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, fs.writeFile(gitIgnorePath, gitIgnoreContent)];
-            case 2:
-                _a.sent();
-                return [3 /*break*/, 4];
-            case 3:
-                err_2 = _a.sent();
-                console.error("Error creating .gitignore file:", err_2);
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
+                _b.sent();
+                return [3 /*break*/, 7];
+            case 6: return [3 /*break*/, 7];
+            case 7: return [2 /*return*/];
         }
     });
 }); };
