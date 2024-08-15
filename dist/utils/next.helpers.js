@@ -97,8 +97,8 @@ var updateLayoutFile = function (projectPath) { return __awaiter(void 0, void 0,
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                layoutFilePath = path.join(projectPath, "src", "layout.tsx");
-                return [4 /*yield*/, fs.writeFile(layoutFilePath, "\n  \"use client\";\n\n  import { Inter } from \"next/font/google\";\n  import \"./globals.css\";\n  import Provider from \"@/providers/WagmiProvider\";\n  \n  const inter = Inter({ subsets: [\"latin\"] });\n  \n  export default function RootLayout({\n    children,\n  }: Readonly<{\n    children: React.ReactNode;\n  }>) {\n    return (\n      <html lang=\"en\">\n        <Provider>\n          <body className={inter.className}>{children}</body>\n        </Provider>\n      </html>\n    );\n  }\n    \n")];
+                layoutFilePath = path.join(projectPath, "src", "app", "layout.tsx");
+                return [4 /*yield*/, fs.writeFile(layoutFilePath, "\n  \"use client\";\n\n  import { Inter } from \"next/font/google\";\n  import \"./globals.css\";\n  import Provider from \"@/providers/WagmiProvider\";\n  \n  const inter = Inter({ subsets: [\"latin\"] });\n  \n  export default function RootLayout({\n    children,\n  }: Readonly<{\n    children: React.ReactNode;\n  }>) {\n    return (\n      <Provider>\n        <html lang=\"en\">\n          <body className={inter.className}>{children}</body>\n        </html>\n      </Provider>\n    );\n  }\n    \n")];
             case 1:
                 _a.sent();
                 return [2 /*return*/];

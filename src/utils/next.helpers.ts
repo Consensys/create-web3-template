@@ -53,7 +53,7 @@ export const createNextApp = async (
 };
 
 const updateLayoutFile = async (projectPath: string) => {
-  const layoutFilePath = path.join(projectPath, "src", "layout.tsx");
+  const layoutFilePath = path.join(projectPath, "src", "app", "layout.tsx");
   await fs.writeFile(
     layoutFilePath,
     `
@@ -71,11 +71,11 @@ const updateLayoutFile = async (projectPath: string) => {
     children: React.ReactNode;
   }>) {
     return (
-      <html lang="en">
-        <Provider>
+      <Provider>
+        <html lang="en">
           <body className={inter.className}>{children}</body>
-        </Provider>
-      </html>
+        </html>
+      </Provider>
     );
   }
     
