@@ -15,6 +15,7 @@ npx @consensys/create-web3-template [project-name]
 This will create a new directory with the specified project name and scaffold a new project with the following features:
 
 - Next.js or React (Vite)
+- Foundry or Hardhat
 - TypeScript
 - Tailwind CSS
 - Viem
