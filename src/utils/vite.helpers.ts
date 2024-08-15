@@ -168,6 +168,7 @@ export const client = createPublicClient({
 
 const createTalwindConfig = async (projectPath: string) => {
   const tailwindConfigPath = path.join(projectPath, "tailwind.config.js");
+  await execAsync(`cd ${projectPath} && npx tailwindcss init -p`);
   await fs.writeFile(
     tailwindConfigPath,
     `

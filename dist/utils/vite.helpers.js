@@ -163,8 +163,11 @@ var createTalwindConfig = function (projectPath) { return __awaiter(void 0, void
         switch (_a.label) {
             case 0:
                 tailwindConfigPath = path.join(projectPath, "tailwind.config.js");
-                return [4 /*yield*/, fs.writeFile(tailwindConfigPath, "\n/** @type {import('tailwindcss').Config} */\nexport default {\n  content: [\n    \"./index.html\",\n    \"./src/**/*.{js,ts,jsx,tsx}\",\n  ],\n  theme: {\n    extend: {},\n  },\n  plugins: [],\n}\n    ")];
+                return [4 /*yield*/, execAsync("cd ".concat(projectPath, " && npx tailwindcss init -p"))];
             case 1:
+                _a.sent();
+                return [4 /*yield*/, fs.writeFile(tailwindConfigPath, "\n/** @type {import('tailwindcss').Config} */\nexport default {\n  content: [\n    \"./index.html\",\n    \"./src/**/*.{js,ts,jsx,tsx}\",\n  ],\n  theme: {\n    extend: {},\n  },\n  plugins: [],\n}\n    ")];
+            case 2:
                 _a.sent();
                 return [2 /*return*/];
         }
