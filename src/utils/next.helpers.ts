@@ -27,7 +27,7 @@ export const createNextApp = async (
 
     await updatePackageJsonDependencies(
       {
-        "@consensys/connect-button": "^1.0.2",
+        "@consensys/connect-button": "^1.0.3",
         "@tanstack/react-query": "^5.51.23",
         viem: "2.x",
         wagmi: "^2.12.5",

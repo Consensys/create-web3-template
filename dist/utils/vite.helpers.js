@@ -78,7 +78,7 @@ export var createReactApp = function (options_1) {
                     _a.sent();
                     console.log("React project created successfully!");
                     return [4 /*yield*/, updatePackageJsonDependencies({
-                            "@consensys/connect-button": "^1.0.2",
+                            "@consensys/connect-button": "^1.0.3",
                             "@tanstack/react-query": "^5.51.23",
                             viem: "2.x",
                             wagmi: "^2.12.5",
@@ -179,7 +179,7 @@ var updateIndexCss = function (projectPath) { return __awaiter(void 0, void 0, v
         switch (_a.label) {
             case 0:
                 indexCssPath = path.join(projectPath, "src", "index.css");
-                return [4 /*yield*/, fs.writeFile(indexCssPath, "\n@tailwind base;\n@tailwind components;\n@tailwind utilities;\n    \n")];
+                return [4 /*yield*/, fs.writeFile(indexCssPath, "\n@tailwind base;\n@tailwind components;\n@tailwind utilities;   \n")];
             case 1:
                 _a.sent();
                 return [2 /*return*/];
