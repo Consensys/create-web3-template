@@ -194,8 +194,7 @@ const updateIndexCss = async (projectPath: string) => {
     `
 @tailwind base;
 @tailwind components;
-@tailwind utilities;
-    
+@tailwind utilities;   
 `
   );
 };
