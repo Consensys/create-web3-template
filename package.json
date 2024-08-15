@@ -3,7 +3,7 @@
   "type": "module",
   "module": "dist/index.js",
   "bin": {
-    "create-web3-template": "./dist/src/index.js"
+    "create-web3-template": "./dist/index.js"
   },
   "version": "1.5.1",
   "description": "",

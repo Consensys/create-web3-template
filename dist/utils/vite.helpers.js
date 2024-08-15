@@ -146,10 +146,12 @@ var createClientProvider = function (projectPath) { return __awaiter(void 0, voi
     var clientFilePath;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
+            case 0: return [4 /*yield*/, fs.mkdir(path.join(projectPath, "src", "providers"))];
+            case 1:
+                _a.sent();
                 clientFilePath = path.join(projectPath, "src", "providers", "client.ts");
                 return [4 /*yield*/, fs.writeFile(clientFilePath, "\nimport { createPublicClient, http } from \"viem\";\nimport { linea } from \"viem/chains\";\n\nexport const client = createPublicClient({\n  chain: linea,\n  transport: http(),\n});\n    ")];
-            case 1:
+            case 2:
                 _a.sent();
                 return [2 /*return*/];
         }

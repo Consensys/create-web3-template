@@ -145,6 +145,7 @@ export default function Home() {
 };
 
 const createClientProvider = async (projectPath: string) => {
+  await fs.mkdir(path.join(projectPath, "src", "providers"));
   const clientFilePath = path.join(
     projectPath,
     "src",
