@@ -40,12 +40,18 @@ export const createReactApp = async (
         "@tanstack/react-query": "^5.51.23",
         viem: "2.x",
         wagmi: "^2.12.5",
+        postcss: "^8.4.41",
+        tailwindcss: "^3.4.10",
+        autoprefixer: "^10.4.20",
       },
       projectPath ? projectPath : projectName
     );
     await createWagmiConfigFile(projectPath ? projectPath : projectName);
     await updateMainFile(projectPath ? projectPath : projectName);
     await updateAppFile(projectPath ? projectPath : projectName);
+    await createClientProvider(projectPath ? projectPath : projectName);
+    await createTalwindConfig(projectPath ? projectPath : projectName);
+    await updateIndexCss(projectPath ? projectPath : projectName);
   } catch (error) {
     console.error("An error occurred during project creation:", error);
   }
@@ -135,5 +141,59 @@ export default function Home() {
   );
 }
       `
+  );
+};
+
+const createClientProvider = async (projectPath: string) => {
+  const clientFilePath = path.join(
+    projectPath,
+    "src",
+    "providers",
+    "client.ts"
+  );
+  await fs.writeFile(
+    clientFilePath,
+    `
+import { createPublicClient, http } from "viem";
+import { linea } from "viem/chains";
+
+export const client = createPublicClient({
+  chain: linea,
+  transport: http(),
+});
+    `
+  );
+};
+
+const createTalwindConfig = async (projectPath: string) => {
+  const tailwindConfigPath = path.join(projectPath, "tailwind.config.js");
+  await fs.writeFile(
+    tailwindConfigPath,
+    `
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+    `
+  );
+};
+
+const updateIndexCss = async (projectPath: string) => {
+  const indexCssPath = path.join(projectPath, "src", "index.css");
+  await fs.writeFile(
+    indexCssPath,
+    `
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+    
+`
   );
 };

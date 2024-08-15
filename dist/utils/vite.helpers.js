@@ -72,7 +72,7 @@ export var createReactApp = function (options_1) {
                     }
                     _a.label = 1;
                 case 1:
-                    _a.trys.push([1, 7, , 8]);
+                    _a.trys.push([1, 10, , 11]);
                     return [4 /*yield*/, execAsync(command(projectName, projectPath))];
                 case 2:
                     _a.sent();
@@ -82,6 +82,9 @@ export var createReactApp = function (options_1) {
                             "@tanstack/react-query": "^5.51.23",
                             viem: "2.x",
                             wagmi: "^2.12.5",
+                            postcss: "^8.4.41",
+                            tailwindcss: "^3.4.10",
+                            autoprefixer: "^10.4.20",
                         }, projectPath ? projectPath : projectName)];
                 case 3:
                     _a.sent();
@@ -94,12 +97,21 @@ export var createReactApp = function (options_1) {
                     return [4 /*yield*/, updateAppFile(projectPath ? projectPath : projectName)];
                 case 6:
                     _a.sent();
-                    return [3 /*break*/, 8];
+                    return [4 /*yield*/, createClientProvider(projectPath ? projectPath : projectName)];
                 case 7:
+                    _a.sent();
+                    return [4 /*yield*/, createTalwindConfig(projectPath ? projectPath : projectName)];
+                case 8:
+                    _a.sent();
+                    return [4 /*yield*/, updateIndexCss(projectPath ? projectPath : projectName)];
+                case 9:
+                    _a.sent();
+                    return [3 /*break*/, 11];
+                case 10:
                     error_1 = _a.sent();
                     console.error("An error occurred during project creation:", error_1);
-                    return [3 /*break*/, 8];
-                case 8: return [2 /*return*/];
+                    return [3 /*break*/, 11];
+                case 11: return [2 /*return*/];
             }
         });
     });
@@ -124,6 +136,45 @@ var updateAppFile = function (projectPath) { return __awaiter(void 0, void 0, vo
             case 0:
                 appFilePath = path.join(projectPath, "src", "App.tsx");
                 return [4 /*yield*/, fs.writeFile(appFilePath, "\nimport { client } from \"./providers/client\";\nimport { useEffect, useState } from \"react\";\nimport { useAccount } from \"wagmi\";\nimport { ConnectButton } from \"@consensys/connect-button\";\n\nexport default function Home() {\n  const { isConnected, address } = useAccount();\n  const [blockNumber, setBlockNumber] = useState<bigint | null>(null);\n\n  useEffect(() => {\n    client.getBlockNumber().then((block) => {\n      setBlockNumber(block);\n    });\n  }, []);\n\n  return (\n    <main className=\"relative flex flex-col items-center gap-20 min-h-screen mx-auto md:p-24\">\n      <div className=\"flex justify-center pt-10 md:pt-0 z-10 max-w-5xl w-full lg:items-center lg:justify-between font-mono text-sm lg:flex\">\n        <div className=\"absolute bottom-0 left-0 flex w-full items-end justify-center lg:static lg:h-auto lg:w-auto lg:bg-none\">\n          <a\n            className=\"pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0\"\n            href=\"#\"\n            target=\"_blank\"\n            rel=\"noopener noreferrer\"\n          >\n            By RAD Team\n          </a>\n        </div>\n        <ConnectButton />\n      </div>\n\n      <div className=\"flex mt-52 flex-col items-center\">\n        <span className=\"text-3xl font-bold\">Web3 Starter template</span>\n        {isConnected && (\n          <span className=\"text-sm font-mono font-medium max-w-md text-center text-gray-500\">\n            Connected to: {address}\n          </span>\n        )}\n\n        <div className=\"text-sm font-mono font-medium max-w-md text-center text-gray-500\">\n          {!blockNumber ? (\n            \"Loading block number...\"\n          ) : (\n            <div>Linea block number: {Number(blockNumber)}</div>\n          )}\n        </div>\n      </div>\n    </main>\n  );\n}\n      ")];
+            case 1:
+                _a.sent();
+                return [2 /*return*/];
+        }
+    });
+}); };
+var createClientProvider = function (projectPath) { return __awaiter(void 0, void 0, void 0, function () {
+    var clientFilePath;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                clientFilePath = path.join(projectPath, "src", "providers", "client.ts");
+                return [4 /*yield*/, fs.writeFile(clientFilePath, "\nimport { createPublicClient, http } from \"viem\";\nimport { linea } from \"viem/chains\";\n\nexport const client = createPublicClient({\n  chain: linea,\n  transport: http(),\n});\n    ")];
+            case 1:
+                _a.sent();
+                return [2 /*return*/];
+        }
+    });
+}); };
+var createTalwindConfig = function (projectPath) { return __awaiter(void 0, void 0, void 0, function () {
+    var tailwindConfigPath;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                tailwindConfigPath = path.join(projectPath, "tailwind.config.js");
+                return [4 /*yield*/, fs.writeFile(tailwindConfigPath, "\n/** @type {import('tailwindcss').Config} */\nexport default {\n  content: [\n    \"./index.html\",\n    \"./src/**/*.{js,ts,jsx,tsx}\",\n  ],\n  theme: {\n    extend: {},\n  },\n  plugins: [],\n}\n    ")];
+            case 1:
+                _a.sent();
+                return [2 /*return*/];
+        }
+    });
+}); };
+var updateIndexCss = function (projectPath) { return __awaiter(void 0, void 0, void 0, function () {
+    var indexCssPath;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                indexCssPath = path.join(projectPath, "src", "index.css");
+                return [4 /*yield*/, fs.writeFile(indexCssPath, "\n@tailwind base;\n@tailwind components;\n@tailwind utilities;\n    \n")];
             case 1:
                 _a.sent();
                 return [2 /*return*/];
