@@ -30,12 +30,6 @@ Using **npx**:
 npx @consensys/create-web3-template [project-name]
 ```
 
-Using **npm init**:
-
-```bash
-npm init @consensys/create-web3-template [project-name]
-```
-
 ### Interactive Setup
 
 After running the command, the CLI will guide you through the setup process with the following prompts:
