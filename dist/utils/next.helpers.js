@@ -38,19 +38,19 @@ import path from "path";
 import { promises as fs } from "fs";
 import { createWagmiConfigFile, execAsync, pathOrProjectName, updatePackageJsonDependencies, usePackageManager, } from "./index.js";
 export var createNextApp = function (options, projectPath) { return __awaiter(void 0, void 0, void 0, function () {
-    var projectName, packageManager, command, _a, error_1;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+    var projectName, packageManager, command, error_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
             case 0:
                 console.log("Creating Next.js project...");
-                _b.label = 1;
+                _a.label = 1;
             case 1:
-                _b.trys.push([1, 12, , 13]);
+                _a.trys.push([1, 8, , 9]);
                 projectName = options.projectName, packageManager = options.packageManager;
-                command = "npx create-next-app ".concat(pathOrProjectName(projectName, projectPath), " --ts --tailwind --eslint --app --src-dir --import-alias \"@/*\" ").concat(usePackageManager(packageManager));
+                command = "npx create-next-app ".concat(pathOrProjectName(projectName, projectPath), " --ts --tailwind --eslint --app --src-dir --skip-install --import-alias \"@/*\" ").concat(usePackageManager(packageManager), " --turbopack");
                 return [4 /*yield*/, execAsync(command)];
             case 2:
-                _b.sent();
+                _a.sent();
                 return [4 /*yield*/, updatePackageJsonDependencies({
                         "@consensys/connect-button": "^1.0.3",
                         "@tanstack/react-query": "^5.51.23",
@@ -58,37 +58,26 @@ export var createNextApp = function (options, projectPath) { return __awaiter(vo
                         wagmi: "^2.12.5",
                     }, pathOrProjectName(projectName, projectPath))];
             case 3:
-                _b.sent();
+                _a.sent();
                 return [4 /*yield*/, updateLayoutFile(pathOrProjectName(projectName, projectPath))];
             case 4:
-                _b.sent();
+                _a.sent();
                 return [4 /*yield*/, createProvider(pathOrProjectName(projectName, projectPath))];
             case 5:
-                _b.sent();
+                _a.sent();
                 return [4 /*yield*/, createWagmiConfigFile(projectPath ? "".concat(projectPath, "/src") : "".concat(projectName, "/src"))];
             case 6:
-                _b.sent();
+                _a.sent();
                 return [4 /*yield*/, updatePageFile(pathOrProjectName(projectName, projectPath))];
             case 7:
-                _b.sent();
-                if (!(packageManager === "npm" || packageManager === "pnpm")) return [3 /*break*/, 9];
-                return [4 /*yield*/, execAsync("cd ".concat(projectName, " && ").concat(packageManager, " i"))];
-            case 8:
-                _a = _b.sent();
-                return [3 /*break*/, 11];
-            case 9: return [4 /*yield*/, execAsync("cd ".concat(projectName, " && ").concat(packageManager))];
-            case 10:
-                _a = _b.sent();
-                _b.label = 11;
-            case 11:
-                _a;
+                _a.sent();
                 console.log("Next.js project created successfully!");
-                return [3 /*break*/, 13];
-            case 12:
-                error_1 = _b.sent();
+                return [3 /*break*/, 9];
+            case 8:
+                error_1 = _a.sent();
                 console.error("An unexpected error occurred:", error_1);
-                return [3 /*break*/, 13];
-            case 13: return [2 /*return*/];
+                return [3 /*break*/, 9];
+            case 9: return [2 /*return*/];
         }
     });
 }); };

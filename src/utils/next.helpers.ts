@@ -19,9 +19,9 @@ export const createNextApp = async (
     const command = `npx create-next-app ${pathOrProjectName(
       projectName,
       projectPath
-    )} --ts --tailwind --eslint --app --src-dir --import-alias "@/*" ${usePackageManager(
+    )} --ts --tailwind --eslint --app --src-dir --skip-install --import-alias "@/*" ${usePackageManager(
       packageManager
-    )}`;
+    )} --turbopack`;
 
     await execAsync(command);
 
@@ -41,10 +41,6 @@ export const createNextApp = async (
       projectPath ? `${projectPath}/src` : `${projectName}/src`
     );
     await updatePageFile(pathOrProjectName(projectName, projectPath));
-
-    packageManager === "npm" || packageManager === "pnpm"
-      ? await execAsync(`cd ${projectName} && ${packageManager} i`)
-      : await execAsync(`cd ${projectName} && ${packageManager}`);
 
     console.log("Next.js project created successfully!");
   } catch (error) {
